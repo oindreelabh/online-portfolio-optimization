@@ -1,0 +1,63 @@
+2025-05-24 21:00:25,539 - INFO - Fetching data for AAPL from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:26,329 - INFO - Saved data for AAPL to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/AAPL.csv
+2025-05-24 21:00:26,329 - INFO - Fetching data for TSLA from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:26,906 - INFO - Saved data for TSLA to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/TSLA.csv
+2025-05-24 21:00:26,906 - INFO - Fetching data for AMZN from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:27,423 - INFO - Saved data for AMZN to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/AMZN.csv
+2025-05-24 21:00:27,423 - INFO - Fetching data for MSFT from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:28,031 - INFO - Saved data for MSFT to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/MSFT.csv
+2025-05-24 21:00:28,031 - INFO - Fetching data for NVDA from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:28,664 - INFO - Saved data for NVDA to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/NVDA.csv
+2025-05-24 21:00:28,665 - INFO - Fetching data for GME from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:29,066 - INFO - Saved data for GME to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/GME.csv
+2025-05-24 21:00:29,066 - INFO - Fetching data for AMC from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:29,531 - INFO - Saved data for AMC to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/AMC.csv
+2025-05-24 21:00:29,531 - INFO - Fetching data for META from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:29,975 - INFO - Saved data for META to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/META.csv
+2025-05-24 21:00:29,976 - INFO - Fetching data for XOM from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:30,708 - INFO - Saved data for XOM to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/XOM.csv
+2025-05-24 21:00:30,708 - INFO - Fetching data for JPM from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:31,518 - INFO - Saved data for JPM to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/JPM.csv
+2025-05-24 21:00:31,518 - INFO - Fetching data for SPY from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:31,966 - INFO - Saved data for SPY to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/SPY.csv
+2025-05-24 21:00:31,966 - INFO - Fetching data for GLD from 2018-01-01 to 2025-05-24
+2025-05-24 21:00:32,340 - INFO - Saved data for GLD to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/GLD.csv
+2025-05-24 21:03:18,223 - INFO - Fetching data for AAPL from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:19,270 - INFO - Fetching data for TSLA from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:19,862 - INFO - Fetching data for AMZN from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:20,367 - INFO - Fetching data for MSFT from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:20,890 - INFO - Fetching data for NVDA from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:21,304 - INFO - Fetching data for GME from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:21,587 - INFO - Fetching data for AMC from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:22,217 - INFO - Fetching data for META from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:22,730 - INFO - Fetching data for XOM from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:23,246 - INFO - Fetching data for JPM from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:23,747 - INFO - Fetching data for SPY from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:24,473 - INFO - Fetching data for GLD from 2018-01-01 to 2025-05-24
+2025-05-24 21:03:25,310 - INFO - Saved merged data for 12 tickers to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/merged_stock_data.csv
+2025-05-24 21:04:37,988 - INFO - Fetching data for AAPL from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:38,806 - INFO - Fetching data for TSLA from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:39,118 - INFO - Fetching data for AMZN from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:39,467 - INFO - Fetching data for MSFT from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:39,767 - INFO - Fetching data for NVDA from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:40,123 - INFO - Fetching data for GME from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:40,449 - INFO - Fetching data for AMC from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:40,860 - INFO - Fetching data for META from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:41,277 - INFO - Fetching data for XOM from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:41,628 - INFO - Fetching data for JPM from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:41,934 - INFO - Fetching data for SPY from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:42,268 - INFO - Fetching data for GLD from 2018-01-01 to 2025-05-24
+2025-05-24 21:04:42,827 - INFO - Saved merged data for 12 tickers to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/merged_stock_data.csv
+2025-05-24 21:18:35,597 - INFO - Fetching data for AAPL from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:36,911 - INFO - Fetching data for TSLA from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:37,575 - INFO - Fetching data for AMZN from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:38,176 - INFO - Fetching data for MSFT from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:39,203 - INFO - Fetching data for NVDA from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:39,720 - INFO - Fetching data for GME from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:40,344 - INFO - Fetching data for AMC from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:40,952 - INFO - Fetching data for META from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:41,340 - INFO - Fetching data for XOM from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:41,862 - INFO - Fetching data for JPM from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:42,457 - INFO - Fetching data for SPY from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:43,003 - INFO - Fetching data for GLD from 2018-01-01 to 2025-05-24
+2025-05-24 21:18:43,635 - INFO - Saved merged data for 12 tickers to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/merged_stock_data.csv
