@@ -1,35 +1,45 @@
 import os
 import psycopg2
 from src.utils.logger import setup_logger
-from src.utils.constants import TABLE_NAME, NEON_DB_URL
+from src.utils.constants import NEON_DB_URL
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
-CREATE_TABLE_SQL = f"""
-CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
-    date DATE NOT NULL,
-    ticker TEXT NOT NULL,
-    open DOUBLE PRECISION,
-    high DOUBLE PRECISION,
-    low DOUBLE PRECISION,
-    close DOUBLE PRECISION,
-    volume BIGINT,
-    PRIMARY KEY (date, ticker)
-);
-"""
+def map_dtype(dtype):
+    """Map pandas dtype to PostgreSQL dtype."""
+    if "int" in str(dtype):
+        return "BIGINT"
+    elif "float" in str(dtype):
+        return "DOUBLE PRECISION"
+    elif "bool" in str(dtype):
+        return "BOOLEAN"
+    elif "datetime" in str(dtype):
+        return "TIMESTAMP"
+    else:
+        return "TEXT"
 
-def create_table():
+def create_table_if_not_exists(df, table_name):
+    """Create table in Neon DB based on DataFrame schema."""
     try:
-        logger.info("Connecting to Neon database...")
         conn = psycopg2.connect(NEON_DB_URL)
-        cur = conn.cursor()
-        cur.execute(CREATE_TABLE_SQL)
-        conn.commit()
-        cur.close()
-        conn.close()
-        logger.info(f"✅ Table `{TABLE_NAME}` ensured in Neon DB.")
-    except Exception as e:
-        logger.error(f"❌ Failed to create table: {e}")
-        raise
+        cursor = conn.cursor()
 
-create_table()
+        columns = []
+        for col, dtype in df.dtypes.items():
+            pg_type = map_dtype(dtype)
+            columns.append(f'"{col}" {pg_type}')
+
+        column_definitions = ", ".join(columns)
+        create_table_query = f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            {column_definitions}
+        );
+        """
+        cursor.execute(create_table_query)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        logger.info(f"Table `{table_name}` created or already exists.")
+    except Exception as e:
+        logger.error(f"Failed to create table {table_name}: {e}")
+        raise

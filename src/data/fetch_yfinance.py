@@ -39,7 +39,7 @@ def main():
     try:
         df = fetch_yfinance_data(TICKERS)
         logger.info("Writing data to Neon DB...")
-        write_df_to_neon(df)
+        write_df_to_neon(df, "stock_prices")
     except Exception as e:
         logger.error(f"Pipeline failed: {e}")
 

@@ -1,2 +1,5 @@
 2025-05-25 17:56:52,956 - INFO - Connecting to Neon database...
 2025-05-25 17:56:55,696 - INFO - ✅ Table `stock_prices` ensured in Neon DB.
+2025-05-25 19:18:33,182 - INFO - Table `reddit_posts` created or already exists.
+2025-05-25 19:22:14,887 - INFO - Table `reddit_posts` created or already exists.
+2025-05-25 19:49:05,139 - INFO - Table `google_trends` created or already exists.

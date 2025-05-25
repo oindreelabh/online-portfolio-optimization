@@ -2,23 +2,15 @@ import os
 from dotenv import load_dotenv
 import praw
 import pandas as pd
-import logging
 from datetime import datetime, timedelta, timezone
 
 from src.utils.constants import TICKERS, SUBREDDITS
-from src.utils.helpers import LOG_DIR, RAW_DATA_DIR
+from src.utils.logger import setup_logger
+from src.db.write_to_neon import write_df_to_neon
 
 load_dotenv()  # Load env vars from .env file
 
-print("Logs folder is at:", LOG_DIR)
-print("Raw data folder is at:", RAW_DATA_DIR)
-
-log_file_path = os.path.join(LOG_DIR, "fetch_reddit.log")
-logging.basicConfig(
-    filename=log_file_path,
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
 reddit = praw.Reddit(
     client_id=os.getenv("REDDIT_CLIENT_ID"),
@@ -37,7 +29,7 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
 
     all_posts = []
     for subreddit in subreddits:
-        logging.info(f"Fetching posts from r/{subreddit}")
+        logger.info(f"Fetching posts from r/{subreddit}")
         try:
             subreddit_obj = reddit.subreddit(subreddit)
             for submission in subreddit_obj.new(limit=limit):
@@ -45,7 +37,7 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
                 if created < start_time:
                     continue  # Ignore older posts
 
-                # Check if submission title or selftext contains any keywords
+                # Check if the submission title or selftext contains any keywords
                 text = (submission.title + " " + submission.selftext).lower()
                 if any(kw.lower() in text for kw in keywords):
                     post_data = {
@@ -65,25 +57,14 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
                     }
                     all_posts.append(post_data)
         except Exception as e:
-            logging.error(f"Error fetching from r/{subreddit}: {e}")
+            logger.error(f"Error fetching from r/{subreddit}: {e}")
 
     if not all_posts:
-        logging.warning("No posts found matching criteria.")
+        logger.warning("No posts found matching criteria.")
         return pd.DataFrame()
 
     df = pd.DataFrame(all_posts)
     return df
-
-
-def save_data(df: pd.DataFrame, output_dir=RAW_DATA_DIR):
-    """
-    Save Reddit data with timestamped filename.
-    """
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    filename = f"reddit_posts_{timestamp}.csv"
-    file_path = os.path.join(output_dir, filename)
-    df.to_csv(file_path, index=False)
-    logging.info(f"Saved {len(df)} Reddit posts to {file_path}")
 
 
 def main():
@@ -92,10 +73,9 @@ def main():
 
     df = fetch_recent_posts(subreddits=subreddits, keywords=tickers, limit=1000, days=1)
     if not df.empty:
-        save_data(df)
+        write_df_to_neon(df, "reddit_posts")
     else:
-        logging.info("No new relevant Reddit posts found.")
-
+        logger.info("No new relevant Reddit posts found.")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,4 @@
+2025-05-25 19:48:45,541 - INFO - Starting Google Trends fetch for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C']
+2025-05-25 19:48:51,729 - ERROR - Error fetching trends data for ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA']: The request failed: Google returned a response with code 429
+2025-05-25 19:48:57,494 - INFO - Fetched data for batch: ['GME', 'AMC', 'META', 'JPM', 'SPY']
+2025-05-25 19:49:02,454 - INFO - Fetched data for batch: ['UNH', 'C']

@@ -5,7 +5,7 @@ TICKERS = [
 ]
 
 SUBREDDITS = [
-    "stocks", "wallstreetbets", "investing", "stockmarket"
+    "stocks", "wallstreetbets", "investing", "stockmarket", "pennystocks"
 ]
 
 import os
