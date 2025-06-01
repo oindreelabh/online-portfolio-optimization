@@ -18,7 +18,6 @@ reddit = praw.Reddit(
     user_agent=os.getenv("REDDIT_USER_AGENT")
 )
 
-
 def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
     """
     Fetch recent Reddit submissions from given subreddits containing any of the keywords
@@ -66,16 +65,23 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
     df = pd.DataFrame(all_posts)
     return df
 
-
-def main():
-    subreddits = SUBREDDITS
-    tickers = TICKERS
-
-    df = fetch_recent_posts(subreddits=subreddits, keywords=tickers, limit=1000, days=1)
+def fetch_and_store_recent_reddit_posts(
+    subreddits=SUBREDDITS,
+    keywords=TICKERS,
+    limit=1000,
+    days=1,
+    table_name="reddit_posts"
+):
+    """
+    Fetches recent Reddit posts and writes them to Neon DB.
+    Designed for Airflow or other programmatic use.
+    """
+    logger.info(f"Starting fetch_and_store_recent_reddit_posts for last {days} days, limit {limit}")
+    df = fetch_recent_posts(subreddits=subreddits, keywords=keywords, limit=limit, days=days)
     if not df.empty:
-        write_df_to_neon(df, "reddit_posts")
+        write_df_to_neon(df, table_name)
+        logger.info(f"Stored {len(df)} Reddit posts to table '{table_name}'.")
     else:
         logger.info("No new relevant Reddit posts found.")
 
-if __name__ == "__main__":
-    main()
+# No main() block! Safe for Airflow import and use.

@@ -9,13 +9,12 @@ logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
 def fetch_yfinance_data(tickers: list[str], period="1mo", interval="1d") -> pd.DataFrame:
     try:
-        logger.info(f"Fetching yfinance data for tickers: {tickers}")
+        logger.info(f"Fetching yfinance data for tickers: {tickers} | Period: {period}")
         df = yf.download(tickers, period=period, interval=interval, group_by='ticker', auto_adjust=False)
         logger.info("Successfully fetched yfinance data.")
 
-        # Flatten multi-index: (Price, Ticker) → separate rows
         flat_df = (
-            df.stack(level=0, future_stack=True)  # Make each ticker a row group
+            df.stack(level=0, future_stack=True)
             .reset_index()
             .rename(columns={
                 "Date": "date",
@@ -27,7 +26,6 @@ def fetch_yfinance_data(tickers: list[str], period="1mo", interval="1d") -> pd.D
                 "Ticker": "ticker"
             })[["date", "ticker", "open", "high", "low", "close", "volume"]]
         )
-
         logger.info("Successfully transformed yfinance data to flat format.")
         return flat_df
 
@@ -35,13 +33,22 @@ def fetch_yfinance_data(tickers: list[str], period="1mo", interval="1d") -> pd.D
         logger.error(f"Error fetching yfinance data: {e}")
         raise
 
-def main():
+def fetch_and_store_historical_data():
     try:
-        df = fetch_yfinance_data(TICKERS)
-        logger.info("Writing data to Neon DB...")
-        write_df_to_neon(df, "stock_prices")
+        logger.info("Fetching historical data for last 2 years...")
+        df = fetch_yfinance_data(TICKERS, period="2y", interval="1d")
+        logger.info("Writing historical data to Neon DB...")
+        write_df_to_neon(df, "stock_prices_historical")
+        logger.info("Historical data written successfully.")
     except Exception as e:
-        logger.error(f"Pipeline failed: {e}")
+        logger.error(f"Failed to fetch/store historical data: {e}")
 
-if __name__ == "__main__":
-    main()
+def fetch_and_store_latest_data():
+    try:
+        logger.info("Fetching latest data for last 1 month...")
+        df = fetch_yfinance_data(TICKERS, period="1mo", interval="1d")
+        logger.info("Writing latest data to Neon DB...")
+        write_df_to_neon(df, "stock_prices_latest")
+        logger.info("Latest data written successfully.")
+    except Exception as e:
+        logger.error(f"Failed to fetch/store latest data: {e}")
