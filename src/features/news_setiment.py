@@ -1,8 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from src.utils.logger import setup_logger
+import os
 
-logger = setup_logger("news_sentiment")
+logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
 # Load FinBERT model only once
 tokenizer = AutoTokenizer.from_pretrained('yiyanghkust/finbert-pretrain')

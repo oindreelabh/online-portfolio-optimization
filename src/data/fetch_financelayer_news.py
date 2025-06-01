@@ -43,7 +43,7 @@ def fetch_financelayer_news(keywords, limit=100):
     return df
 
 def fetch_and_store_news():
-    df = fetch_financelayer_news(TICKERS, limit=50, date="today")
+    df = fetch_financelayer_news(TICKERS, limit=100)
     if not df.empty:
         write_df_to_neon(df, "financial_news_raw")
         logger.info("News data written to Neon DB.")
