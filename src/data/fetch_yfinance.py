@@ -4,6 +4,7 @@ import pandas as pd
 from src.utils.logger import setup_logger
 from src.db.write_to_neon import write_df_to_neon
 from src.utils.constants import TICKERS
+from src.data.preprocess import preprocess_yfinance
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
@@ -27,6 +28,8 @@ def fetch_yfinance_data(tickers: list[str], period="1mo", interval="1d") -> pd.D
             })[["date", "ticker", "open", "high", "low", "close", "volume"]]
         )
         logger.info("Successfully transformed yfinance data to flat format.")
+        flat_df = preprocess_yfinance(flat_df)
+        logger.info("Successfully preprocessed yfinance data.")
         return flat_df
 
     except Exception as e:

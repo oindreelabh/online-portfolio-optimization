@@ -4,6 +4,7 @@ import praw
 import pandas as pd
 from datetime import datetime, timedelta, timezone
 
+from src.data.preprocess import preprocess_reddit
 from src.utils.constants import TICKERS, SUBREDDITS
 from src.utils.logger import setup_logger
 from src.db.write_to_neon import write_df_to_neon
@@ -49,10 +50,7 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
                         "num_comments": submission.num_comments,
                         "total_awards_received": submission.total_awards_received,
                         "author": str(submission.author),
-                        "url": submission.url,
-                        "subreddit": subreddit,
-                        "is_stickied": submission.stickied,
-                        "over_18": submission.over_18,  # NSFW flag
+                        "subreddit": subreddit
                     }
                     all_posts.append(post_data)
         except Exception as e:
@@ -79,9 +77,10 @@ def fetch_and_store_recent_reddit_posts(
     logger.info(f"Starting fetch_and_store_recent_reddit_posts for last {days} days, limit {limit}")
     df = fetch_recent_posts(subreddits=subreddits, keywords=keywords, limit=limit, days=days)
     if not df.empty:
+        logger.info(f"Fetched {len(df)} Reddit posts.")
+        df = preprocess_reddit(df)
+        logger.info("Preprocessed Reddit posts.")
         write_df_to_neon(df, table_name)
         logger.info(f"Stored {len(df)} Reddit posts to table '{table_name}'.")
     else:
         logger.info("No new relevant Reddit posts found.")
-
-# No main() block! Safe for Airflow import and use.
