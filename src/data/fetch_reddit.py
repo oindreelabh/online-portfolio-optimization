@@ -19,7 +19,7 @@ reddit = praw.Reddit(
     user_agent=os.getenv("REDDIT_USER_AGENT")
 )
 
-def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
+def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
     """
     Fetch recent Reddit submissions from given subreddits containing any of the keywords
     within the last `days` days. Adds a column for mentioned tickers.
@@ -44,7 +44,7 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=1):
                     mentioned_tickers = [kw for kw in keywords if kw.lower() in text]
                     post_data = {
                         "id": submission.id,
-                        "created_utc": created,
+                        "date": created.date(),
                         "title": submission.title,
                         "selftext": submission.selftext,
                         "score": submission.score,
@@ -70,7 +70,7 @@ def fetch_and_store_recent_reddit_posts(
     subreddits=SUBREDDITS,
     keywords=TICKERS,
     limit=1000,
-    days=1
+    days=30
 ):
     """
     Fetches recent Reddit posts and writes them to Neon DB.
@@ -87,12 +87,12 @@ def fetch_and_store_recent_reddit_posts(
     else:
         logger.info("No new relevant Reddit posts found.")
 
-if __name__ == "__main__":
-    # Example usage
-    fetch_and_store_recent_reddit_posts(
-        subreddits=SUBREDDITS,
-        keywords=TICKERS,
-        limit=1000,
-        days=1
-    )
-    logger.info("Reddit data fetching and storing completed.")
+# if __name__ == "__main__":
+#     # Example usage
+#     fetch_and_store_recent_reddit_posts(
+#         subreddits=SUBREDDITS,
+#         keywords=TICKERS,
+#         limit=1000,
+#         days=1
+#     )
+#     logger.info("Reddit data fetching and storing completed.")

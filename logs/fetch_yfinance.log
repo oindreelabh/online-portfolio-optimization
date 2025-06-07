@@ -38,3 +38,41 @@
 2025-06-07 20:28:58,446 - INFO - Successfully preprocessed yfinance data.
 2025-06-07 20:28:58,448 - INFO - Latest data written successfully to ../../data/raw/stock_prices_latest.csv.
 2025-06-07 20:28:58,448 - INFO - YFinance data fetching and storing completed.
+2025-06-08 00:24:03,045 - INFO - Fetching historical data for last 2 years...
+2025-06-08 00:24:03,045 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 2y
+2025-06-08 00:24:09,873 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:24:09,881 - INFO - Successfully transformed yfinance data to flat format.
+2025-06-08 00:24:09,898 - INFO - Successfully preprocessed yfinance data.
+2025-06-08 00:24:09,923 - INFO - Historical data written successfully to ../../data/raw/stock_prices_historical.csv.
+2025-06-08 00:24:09,923 - INFO - Fetching latest data for last 1 day...
+2025-06-08 00:24:09,923 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 1d
+2025-06-08 00:24:13,663 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:24:13,698 - ERROR - Error fetching yfinance data: "['date'] not in index"
+2025-06-08 00:24:13,698 - ERROR - Failed to fetch/store latest data: "['date'] not in index"
+2025-06-08 00:24:13,698 - INFO - YFinance data fetching and storing completed.
+2025-06-08 00:27:59,066 - INFO - Fetching historical data for last 2 years...
+2025-06-08 00:27:59,066 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 2y
+2025-06-08 00:28:03,850 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:28:03,856 - INFO - Successfully transformed yfinance data to flat format.
+2025-06-08 00:28:03,872 - INFO - Successfully preprocessed yfinance data.
+2025-06-08 00:28:03,897 - INFO - Historical data written successfully to ../../data/raw/stock_prices_historical.csv.
+2025-06-08 00:28:03,897 - INFO - Fetching latest data for last 1 week...
+2025-06-08 00:28:03,897 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 7d
+2025-06-08 00:28:09,158 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:28:09,163 - INFO - Successfully transformed yfinance data to flat format.
+2025-06-08 00:28:09,173 - INFO - Successfully preprocessed yfinance data.
+2025-06-08 00:28:09,174 - INFO - Latest data written successfully to ../../data/raw/stock_prices_latest.csv.
+2025-06-08 00:28:09,175 - INFO - YFinance data fetching and storing completed.
+2025-06-08 00:28:44,024 - INFO - Fetching historical data for last 2 years...
+2025-06-08 00:28:44,025 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 2y
+2025-06-08 00:28:49,001 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:28:49,007 - INFO - Successfully transformed yfinance data to flat format.
+2025-06-08 00:28:49,021 - INFO - Successfully preprocessed yfinance data.
+2025-06-08 00:28:49,047 - INFO - Historical data written successfully to ../../data/raw/stock_prices_historical.csv.
+2025-06-08 00:28:49,047 - INFO - Fetching latest data for last 1 week...
+2025-06-08 00:28:49,047 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'C'] | Period: 1mo
+2025-06-08 00:28:54,429 - INFO - Successfully fetched yfinance data.
+2025-06-08 00:28:54,481 - INFO - Successfully transformed yfinance data to flat format.
+2025-06-08 00:28:54,486 - INFO - Successfully preprocessed yfinance data.
+2025-06-08 00:28:54,489 - INFO - Latest data written successfully to ../../data/raw/stock_prices_latest.csv.
+2025-06-08 00:28:54,489 - INFO - YFinance data fetching and storing completed.

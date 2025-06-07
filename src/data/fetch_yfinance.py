@@ -47,7 +47,7 @@ def fetch_and_store_historical_data():
 
 def fetch_and_store_latest_data():
     try:
-        logger.info("Fetching latest data for last 1 month...")
+        logger.info("Fetching latest data for last 1 week...")
         df = fetch_yfinance_data(TICKERS, period="1mo", interval="1d")
         csv_path = write_df_to_csv(df, "../../data/raw", "stock_prices_latest.csv")
         logger.info(f"Latest data written successfully to {csv_path}.")

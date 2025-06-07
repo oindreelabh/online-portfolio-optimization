@@ -16,8 +16,8 @@ API_KEY = os.getenv("FINANCELAYER_API_KEY")
 
 def get_date_range():
     today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    date_from = yesterday.strftime('%Y-%m-%d')
+    prev_day = today - timedelta(days=30)  # Fetch news from the last 30 days
+    date_from = prev_day.strftime('%Y-%m-%d')
     date_to = today.strftime('%Y-%m-%d')
     return date_from, date_to
 
@@ -38,6 +38,14 @@ def fetch_financelayer_news(keywords, limit=100):
         logger.warning("No news articles found.")
         return pd.DataFrame()
     df = pd.DataFrame(articles)
+    # Add a 'date' column from the published date field in the API response
+    if 'published_at' in df.columns:
+        df['date'] = pd.to_datetime(df['published_at']).dt.date
+    elif 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date']).dt.date
+    else:
+        # If no date field, use current date as fallback
+        df['date'] = pd.Timestamp.now().date()
     logger.info(f"Fetched {len(df)} news articles from FinanceLayer.")
     df = preprocess_financelayer(df)
     return df
@@ -50,6 +58,6 @@ def fetch_and_store_news():
     else:
         logger.info("No news data to store.")
 #
-# if __name__ == "__main__":
-#     fetch_and_store_news()
-#     logger.info("FinanceLayer news fetching and storing completed.")
+if __name__ == "__main__":
+    fetch_and_store_news()
+    logger.info("FinanceLayer news fetching and storing completed.")

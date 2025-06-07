@@ -2,8 +2,6 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import torch
 import pandas as pd
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
 MODEL_NAME = "ProsusAI/finbert"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
