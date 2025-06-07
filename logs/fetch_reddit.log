@@ -28,3 +28,33 @@
 2025-05-24 21:33:12,980 - INFO - Fetching posts from r/investing
 2025-05-24 21:33:27,605 - INFO - Fetching posts from r/stockmarket
 2025-05-24 21:33:44,718 - INFO - Saved 21 Reddit posts to /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/data/raw/reddit_posts_20250524_160344.csv
+2025-06-07 20:32:38,564 - INFO - Starting fetch_and_store_recent_reddit_posts for last 1 days, limit 1000
+2025-06-07 20:32:38,564 - INFO - Fetching posts from r/stocks
+2025-06-07 20:32:54,195 - INFO - Fetching posts from r/wallstreetbets
+2025-06-07 20:33:09,091 - INFO - Fetching posts from r/investing
+2025-06-07 20:33:23,188 - INFO - Fetching posts from r/stockmarket
+2025-06-07 20:33:40,420 - INFO - Fetching posts from r/pennystocks
+2025-06-07 20:34:02,245 - INFO - Fetched 113 Reddit posts.
+2025-06-07 20:34:02,256 - INFO - Preprocessed Reddit posts.
+2025-06-07 20:34:02,262 - INFO - Latest data written successfully to ../../data/raw/reddit_posts.csv.
+2025-06-07 20:34:02,262 - INFO - Reddit data fetching and storing completed.
+2025-06-07 22:10:13,251 - INFO - Starting fetch_and_store_recent_reddit_posts for last 1 days, limit 1000
+2025-06-07 22:10:13,251 - INFO - Fetching posts from r/stocks
+2025-06-07 22:10:28,595 - INFO - Fetching posts from r/wallstreetbets
+2025-06-07 22:10:44,161 - INFO - Fetching posts from r/investing
+2025-06-07 22:11:00,005 - INFO - Fetching posts from r/stockmarket
+2025-06-07 22:11:20,620 - INFO - Fetching posts from r/pennystocks
+2025-06-07 22:11:54,232 - INFO - Fetched 89 Reddit posts.
+2025-06-07 22:11:54,243 - INFO - Preprocessed Reddit posts.
+2025-06-07 22:11:54,252 - INFO - Latest data written successfully to ../../data/raw/reddit_posts.csv.
+2025-06-07 22:11:54,252 - INFO - Reddit data fetching and storing completed.
+2025-06-07 22:13:36,237 - INFO - Starting fetch_and_store_recent_reddit_posts for last 1 days, limit 1000
+2025-06-07 22:13:36,237 - INFO - Fetching posts from r/stocks
+2025-06-07 22:13:53,908 - INFO - Fetching posts from r/wallstreetbets
+2025-06-07 22:14:11,896 - INFO - Fetching posts from r/investing
+2025-06-07 22:14:28,829 - INFO - Fetching posts from r/stockmarket
+2025-06-07 22:14:49,527 - INFO - Fetching posts from r/pennystocks
+2025-06-07 22:15:15,763 - INFO - Fetched 87 Reddit posts.
+2025-06-07 22:15:15,775 - INFO - Preprocessed Reddit posts.
+2025-06-07 22:15:15,782 - INFO - Latest data written successfully to ../../data/raw/reddit_posts.csv.
+2025-06-07 22:15:15,782 - INFO - Reddit data fetching and storing completed.

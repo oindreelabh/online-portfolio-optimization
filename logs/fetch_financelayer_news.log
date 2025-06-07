@@ -1,0 +1,3 @@
+2025-06-07 20:43:29,416 - INFO - Fetched 100 news articles from FinanceLayer.
+2025-06-07 20:43:29,438 - INFO - Latest data written successfully to ../../data/raw/finance_news.csv.
+2025-06-07 20:43:29,438 - INFO - FinanceLayer news fetching and storing completed.

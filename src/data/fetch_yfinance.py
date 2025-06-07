@@ -2,7 +2,7 @@ import os
 import yfinance as yf
 import pandas as pd
 from src.utils.logger import setup_logger
-from src.db.write_to_neon import write_df_to_neon
+from src.utils.helpers import write_df_to_csv
 from src.utils.constants import TICKERS
 from src.data.preprocess import preprocess_yfinance
 
@@ -40,9 +40,8 @@ def fetch_and_store_historical_data():
     try:
         logger.info("Fetching historical data for last 2 years...")
         df = fetch_yfinance_data(TICKERS, period="2y", interval="1d")
-        logger.info("Writing historical data to Neon DB...")
-        write_df_to_neon(df, "stock_prices_historical")
-        logger.info("Historical data written successfully.")
+        csv_path = write_df_to_csv(df, "../../data/raw", "stock_prices_historical.csv")
+        logger.info(f"Historical data written successfully to {csv_path}.")
     except Exception as e:
         logger.error(f"Failed to fetch/store historical data: {e}")
 
@@ -50,8 +49,13 @@ def fetch_and_store_latest_data():
     try:
         logger.info("Fetching latest data for last 1 month...")
         df = fetch_yfinance_data(TICKERS, period="1mo", interval="1d")
-        logger.info("Writing latest data to Neon DB...")
-        write_df_to_neon(df, "stock_prices_latest")
-        logger.info("Latest data written successfully.")
+        csv_path = write_df_to_csv(df, "../../data/raw", "stock_prices_latest.csv")
+        logger.info(f"Latest data written successfully to {csv_path}.")
     except Exception as e:
         logger.error(f"Failed to fetch/store latest data: {e}")
+
+# if __name__ == "__main__":
+#     fetch_and_store_historical_data()
+#     fetch_and_store_latest_data()
+#     logger.info("YFinance data fetching and storing completed.")
+

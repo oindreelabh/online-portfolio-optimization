@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from src.data.preprocess import preprocess_financelayer
 from src.utils.logger import setup_logger
 from src.utils.constants import TICKERS
-from src.db.write_to_neon import write_df_to_neon
+from src.utils.helpers import write_df_to_csv
 
 load_dotenv()
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
@@ -45,7 +45,11 @@ def fetch_financelayer_news(keywords, limit=100):
 def fetch_and_store_news():
     df = fetch_financelayer_news(TICKERS, limit=100)
     if not df.empty:
-        write_df_to_neon(df, "financial_news_raw")
-        logger.info("News data written to Neon DB.")
+        csv_path = write_df_to_csv(df, "../../data/raw", "finance_news.csv")
+        logger.info(f"Latest data written successfully to {csv_path}.")
     else:
         logger.info("No news data to store.")
+#
+# if __name__ == "__main__":
+#     fetch_and_store_news()
+#     logger.info("FinanceLayer news fetching and storing completed.")
