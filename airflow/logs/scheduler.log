@@ -1,0 +1,23 @@
+  ____________       _____________
+ ____    |__( )_________  __/__  /________      __
+____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /
+___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /
+ _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/
+[2025-06-12T20:56:23.555+0530] {scheduler_job_runner.py:989} INFO - Starting the scheduler
+[2025-06-12T20:56:23.557+0530] {executor_loader.py:269} INFO - Loaded executor: :LocalExecutor:
+[2025-06-12T20:56:23.564+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2025-06-12 20:56:24 +0530] [91202] [INFO] Starting gunicorn 23.0.0
+[2025-06-12 20:56:24 +0530] [91202] [ERROR] Connection in use: ('::', 8793)
+[2025-06-12 20:56:24 +0530] [91202] [ERROR] connection to ('::', 8793) failed: [Errno 48] Address already in use
+[2025-06-12 20:56:25 +0530] [91202] [ERROR] Connection in use: ('::', 8793)
+[2025-06-12 20:56:25 +0530] [91202] [ERROR] connection to ('::', 8793) failed: [Errno 48] Address already in use
+[2025-06-12 20:56:26 +0530] [91202] [ERROR] Connection in use: ('::', 8793)
+[2025-06-12 20:56:26 +0530] [91202] [ERROR] connection to ('::', 8793) failed: [Errno 48] Address already in use
+[2025-06-12 20:56:27 +0530] [91202] [ERROR] Connection in use: ('::', 8793)
+[2025-06-12 20:56:27 +0530][2025-06-12T20:58:37.460+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2025-06-12T21:03:37.495+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2025-06-12T21:08:37.369+0530] {base.py:220} INFO - checking for stale bundle versions locally
+[2025-06-12T21:08:37.383+0530] {manager.py:147} INFO - DAG bundles loaded: dags-folder, example_dags
+[2025-06-12T21:08:37.526+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2025-06-12T21:13:37.559+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs
+[2025-06-12T21:18:37.596+0530] {scheduler_job_runner.py:2128} INFO - Adopting or resetting orphaned tasks for active dag runs

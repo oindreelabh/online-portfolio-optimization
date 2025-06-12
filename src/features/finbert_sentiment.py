@@ -1,15 +1,20 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import torch
 import pandas as pd
+from src.utils.logger import setup_logger
+import os
 
 MODEL_NAME = "ProsusAI/finbert"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-print(model.config.id2label)
-print(model.config.num_labels)
+logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
+logger.info(f"Using FinBERT model: {MODEL_NAME}")
 
 LABELS = model.config.id2label
+
+logger.info(f"LABELS: {LABELS}")
+logger.info("Label Count: %d", model.config.num_labels)
 
 def finbert_predict_sentiment(text: str):
     """
