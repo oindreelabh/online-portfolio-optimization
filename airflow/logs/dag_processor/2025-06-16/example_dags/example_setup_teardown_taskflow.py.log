@@ -1,1 +1,0 @@
-{"timestamp":"2025-06-16T09:35:44.396097","level":"info","event":"Filling up the DagBag from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/.venv/lib/python3.12/site-packages/airflow/example_dags/example_setup_teardown_taskflow.py","logger":"airflow.models.dagbag.DagBag"}

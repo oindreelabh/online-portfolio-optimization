@@ -1,1 +1,0 @@
-{"timestamp":"2025-06-16T09:35:44.488548","level":"info","event":"Filling up the DagBag from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/.venv/lib/python3.12/site-packages/airflow/example_dags/example_passing_params_via_test_command.py","logger":"airflow.models.dagbag.DagBag"}
