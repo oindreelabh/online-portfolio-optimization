@@ -1,8 +1,17 @@
+# Making sure Airflow can find my project code
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
+
 import sys
 import os
 
-# Making sure Airflow can find my project code
-#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
+# Add the project root or src folder to sys.path
+# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# src_path = os.path.join(project_root, 'src')
+#
+# if src_path not in sys.path:
+#     sys.path.insert(0, src_path)
+
 
 from airflow import DAG
 from airflow.providers.standard.operators.python import PythonOperator

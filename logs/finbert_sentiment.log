@@ -1,0 +1,3 @@
+2025-06-14 22:27:29,458 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-06-14 22:27:29,465 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-06-14 22:27:29,465 - INFO - Label Count: 3
