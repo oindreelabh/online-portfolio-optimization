@@ -445,7 +445,7 @@ database_access_isolation = False
 #
 # Variable: AIRFLOW__CORE__INTERNAL_API_SECRET_KEY
 #
-internal_api_secret_key = NR3PHtthXH53nAjIio5gsQ==
+internal_api_secret_key = test
 
 # The ability to allow testing connections across Airflow UI, API and CLI.
 # Supported options: ``Disabled``, ``Enabled``, ``Hidden``. Default: Disabled
@@ -1567,7 +1567,7 @@ access_denied_message = Access is Denied
 #
 # Variable: AIRFLOW__WEBSERVER__SECRET_KEY
 #
-secret_key = NR3PHtthXH53nAjIio5gsQ==
+secret_key = test
 
 # Expose hostname in the web server
 #
