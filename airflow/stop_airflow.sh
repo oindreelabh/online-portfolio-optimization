@@ -18,6 +18,14 @@ else
     echo "No api-server.pid file found."
 fi
 
+# Stop API server
+if [ -f "$AIRFLOW_HOME/webserver.pid" ]; then
+    kill $(cat $AIRFLOW_HOME/webserver.pid) && rm $AIRFLOW_HOME/webserver.pid
+    echo "Stopped Airflow web server."
+else
+    echo "No webserver.pid file found."
+fi
+
 # Stop dag-processor
 if [ -f "$AIRFLOW_HOME/dag-processor.pid" ]; then
     kill $(cat $AIRFLOW_HOME/dag-processor.pid) && rm $AIRFLOW_HOME/dag-processor.pid

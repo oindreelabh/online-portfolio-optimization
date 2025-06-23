@@ -1,11 +1,24 @@
 import pandas as pd
 
-from src.features.finbert_sentiment import add_finbert_sentiment
 from src.utils.logger import setup_logger
 import os
+from src.features.finbert_sentiment import add_finbert_sentiment
+from src.features.finvader_sentiment import add_finvader_sentiment
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
+def add_dual_sentiment(input_df: pd.DataFrame, text_col: str):
+    """
+    Adds FinBERT and Llama-2 sentiment columns and their average.
+    """
+    logger.info("Applying FinBERT sentiment...")
+    df = add_finbert_sentiment(input_df, text_col, prefix="finbert")
+    logger.info("Applying Llama-2 financial sentiment...")
+    df = add_finvader_sentiment(df, text_col, prefix="finvader")
+    logger.info("Calculating average sentiment score...")
+    df["sentiment_score"] = df[["finbert_score", "finvader_score"]].mean(axis=1)
+    logger.info("Dual sentiment annotation completed successfully.")
+    return df
 
 def aggregate_sentiment(df: pd.DataFrame, sentiment_col: str, group_cols=None) -> pd.DataFrame:
     """
@@ -50,6 +63,9 @@ def run_merge_pipeline(
     yf_df = pd.read_csv(yf_path, parse_dates=['date'])
     reddit_df = pd.read_csv(reddit_path, converters={'tickers': eval}, parse_dates=['date'])
     news_df = pd.read_csv(news_path, converters={'tickers': eval}, parse_dates=['date'])
+
+    reddit_df = add_dual_sentiment(reddit_df, "cleaned_text")
+    news_df = add_dual_sentiment(news_df, "cleaned_text")
 
     reddit_agg = aggregate_sentiment(reddit_df, 'reddit_score')
     news_agg = aggregate_sentiment(news_df, 'news_score')

@@ -22,11 +22,10 @@ reddit = praw.Reddit(
 def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
     """
     Fetch recent Reddit submissions from given subreddits containing any of the keywords
-    within the last `days` days. Adds a column for mentioned tickers.
+    within the last `days` days. Concatenates title, selftext, and top 10 comments (by upvotes) into one text field.
     """
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=days)
-
     all_posts = []
     for subreddit in subreddits:
         logger.info(f"Fetching posts from r/{subreddit}")
@@ -36,24 +35,37 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
                 created = datetime.fromtimestamp(submission.created_utc, timezone.utc)
                 if created < start_time:
                     continue  # Ignore older posts
-
                 # Combine title and selftext for keyword search
                 text = (submission.title + " " + submission.selftext).lower()
                 if any(kw.lower() in text for kw in keywords):
                     # Find which tickers are mentioned
                     mentioned_tickers = [kw for kw in keywords if kw.lower() in text]
+
+                    # Fetch and sort comments by upvotes (score)
+                    submission.comments.replace_more(limit=0)
+                    comments = submission.comments.list()
+                    top_comments = sorted(
+                        comments,
+                        key=lambda c: getattr(c, "score", 0),
+                        reverse=True
+                    )[:10]
+                    # Concatenate top comment bodies
+                    top_comments_text = " ".join([c.body for c in top_comments])
+
+                    # Concatenate title, selftext, and top comments
+                    full_text = submission.title + "\n" + submission.selftext + "\n" + top_comments_text
+
                     post_data = {
                         "id": submission.id,
                         "date": created.date(),
-                        "title": submission.title,
-                        "selftext": submission.selftext,
+                        "full_text": full_text,
                         "score": submission.score,
                         "upvote_ratio": submission.upvote_ratio,
                         "num_comments": submission.num_comments,
                         "total_awards_received": submission.total_awards_received,
                         "author": str(submission.author),
                         "subreddit": subreddit,
-                        "tickers": mentioned_tickers
+                        "tickers": mentioned_tickers,
                     }
                     all_posts.append(post_data)
         except Exception as e:
@@ -87,12 +99,12 @@ def fetch_and_store_recent_reddit_posts(
     else:
         logger.info("No new relevant Reddit posts found.")
 
-# if __name__ == "__main__":
-#     # Example usage
-#     fetch_and_store_recent_reddit_posts(
-#         subreddits=SUBREDDITS,
-#         keywords=TICKERS,
-#         limit=1000,
-#         days=1
-#     )
-#     logger.info("Reddit data fetching and storing completed.")
+if __name__ == "__main__":
+    # Example usage
+    fetch_and_store_recent_reddit_posts(
+        subreddits=SUBREDDITS,
+        keywords=TICKERS,
+        limit=1000,
+        days=1
+    )
+    logger.info("Reddit data fetching and storing completed.")

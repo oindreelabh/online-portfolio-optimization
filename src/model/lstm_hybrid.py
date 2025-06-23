@@ -4,6 +4,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.losses import MeanSquaredError
 import joblib
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
@@ -23,7 +24,7 @@ def train_lstm_model(data, feature_col, target_col, lookback=10, epochs=10, batc
         LSTM(50, input_shape=(X.shape[1], 1)),
         Dense(1)
     ])
-    model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer='adam', loss=MeanSquaredError())
     model.fit(X, y, epochs=epochs, batch_size=batch_size, verbose=1)
     model.save(model_save_path)
     logger.info(f"LSTM model trained and saved to {model_save_path}")
@@ -38,6 +39,6 @@ def predict_lstm(model_path, scaler_path, recent_data, lookback=10):
     pred_scaled = model.predict(recent_scaled)
     # Inverse transform to get actual value
     dummy = np.zeros((1, scaler.n_features_in_))
-    dummy[0, 1] = pred_scaled  # Assuming target_col is at index 1
+    dummy[0, 1] = pred_scaled  # target_col is at index 1
     pred_actual = scaler.inverse_transform(dummy)[0, 1]
     return pred_actual

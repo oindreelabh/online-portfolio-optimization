@@ -13,6 +13,8 @@ export PYTHONPATH=$(pwd)/src
 
 echo "PYTHONPATH set to: $PYTHONPATH"
 
+airflow webserver > $AIRFLOW_HOME/logs/webserver.log 2>&1 &
+echo $! > $AIRFLOW_HOME/webserver.pid
 
 # Create necessary folders
 mkdir -p $AIRFLOW_HOME/dags

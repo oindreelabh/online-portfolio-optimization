@@ -26,8 +26,7 @@ def clean_text(text):
     return " ".join(tokens)
 
 def preprocess_reddit(df: pd.DataFrame) -> pd.DataFrame:
-    df['cleaned_text'] = df['title'].fillna('') + ' ' + df['selftext'].fillna('')
-    df['cleaned_text'] = df['cleaned_text'].apply(clean_text)
+    df['cleaned_text'] = df['full_text'].apply(clean_text)
     return df
 
 def preprocess_financelayer(df: pd.DataFrame) -> pd.DataFrame:
