@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import praw
 import pandas as pd
+import argparse
 from datetime import datetime, timedelta, timezone
 
 from src.data.preprocess import preprocess_reddit
@@ -82,7 +83,8 @@ def fetch_and_store_recent_reddit_posts(
     subreddits=SUBREDDITS,
     keywords=TICKERS,
     limit=1000,
-    days=30
+    days=30,
+    filename="reddit_posts.csv"
 ):
     """
     Fetches recent Reddit posts and writes them to Neon DB.
@@ -94,17 +96,22 @@ def fetch_and_store_recent_reddit_posts(
         logger.info(f"Fetched {len(df)} Reddit posts.")
         df = preprocess_reddit(df)
         logger.info("Preprocessed Reddit posts.")
-        csv_path = write_df_to_csv(df, "../../data/raw", "reddit_posts.csv")
+        csv_path = write_df_to_csv(df, "../../data/raw", filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     else:
         logger.info("No new relevant Reddit posts found.")
 
 if __name__ == "__main__":
-    # Example usage
+    logger.info("Starting Reddit data fetching and storing...")
+    parser = argparse.ArgumentParser(description="Fetch and store recent Reddit posts.")
+    parser.add_argument("--filename", type=str, default="reddit_posts.csv", help="Filename to save the fetched posts")
+    args = parser.parse_args()
+
     fetch_and_store_recent_reddit_posts(
         subreddits=SUBREDDITS,
         keywords=TICKERS,
         limit=1000,
-        days=1
+        days=1,
+        filename=args.filename
     )
     logger.info("Reddit data fetching and storing completed.")

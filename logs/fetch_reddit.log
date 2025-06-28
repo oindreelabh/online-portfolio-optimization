@@ -8,3 +8,7 @@
 2025-06-22 17:43:52,170 - INFO - Preprocessed Reddit posts.
 2025-06-22 17:43:52,177 - INFO - Latest data written successfully to ../../data/raw/reddit_posts.csv.
 2025-06-22 17:43:52,177 - INFO - Reddit data fetching and storing completed.
+2025-06-28 19:28:50,637 - INFO - Starting Reddit data fetching and storing...
+2025-06-28 19:28:50,638 - INFO - Starting fetch_and_store_recent_reddit_posts for last 1 days, limit 1000
+2025-06-28 19:28:50,638 - INFO - Fetching posts from r/stocks
+2025-06-28 19:29:27,136 - INFO - Fetching posts from r/wallstreetbets

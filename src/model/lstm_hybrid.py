@@ -1,6 +1,8 @@
 from src.utils.logger import setup_logger
 import os
 import numpy as np
+import pandas as pd
+import argparse
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
@@ -42,3 +44,19 @@ def predict_lstm(model_path, scaler_path, recent_data, lookback=10):
     dummy[0, 1] = pred_scaled  # target_col is at index 1
     pred_actual = scaler.inverse_transform(dummy)[0, 1]
     return pred_actual
+
+#main
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Train and predict with LSTM model")
+    parser.add_argument("--data_path", type=str, required=True, help="Path to input data CSV")
+    parser.add_argument("--feature_col", type=str, default="close", help="Feature column name")
+    parser.add_argument("--target_col", type=str, default="returns", help="Target column name")
+    parser.add_argument("--lookback", type=int, default=10, help="Lookback period for LSTM")
+    parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
+    parser.add_argument("--batch_size", type=int, default=16, help="Batch size for training")
+    parser.add_argument("--model_save_path", type=str, default="lstm_model.h5", help="Path to save the trained model")
+
+    args = parser.parse_args()
+
+    data = pd.read_csv(args.data_path)
+    train_lstm_model(data, args.feature_col, args.target_col, args.lookback, args.epochs, args.batch_size, args.model_save_path)

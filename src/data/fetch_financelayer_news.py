@@ -1,6 +1,7 @@
 import os
 import requests
 import pandas as pd
+import argparse
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
@@ -50,14 +51,18 @@ def fetch_financelayer_news(keywords, limit=100):
     df = preprocess_financelayer(df)
     return df
 
-def fetch_and_store_news():
+def fetch_and_store_news(filename):
     df = fetch_financelayer_news(TICKERS, limit=100)
     if not df.empty:
-        csv_path = write_df_to_csv(df, "../../data/raw", "finance_news.csv")
+        csv_path = write_df_to_csv(df, "../../data/raw", filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     else:
         logger.info("No news data to store.")
 #
 if __name__ == "__main__":
-    fetch_and_store_news()
+    logger.info("Starting FinanceLayer news fetching and storing...")
+    parser = argparse.ArgumentParser(description="Fetch and store FinanceLayer news data.")
+    parser.add_argument("--filename", type=str, default="financelayer_news.csv", help="Filename to save the fetched news")
+    args = parser.parse_args()
+    fetch_and_store_news(args.filename)
     logger.info("FinanceLayer news fetching and storing completed.")

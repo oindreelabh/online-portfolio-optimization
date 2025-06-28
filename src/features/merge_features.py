@@ -4,6 +4,7 @@ from src.utils.logger import setup_logger
 import os
 from src.features.finbert_sentiment import add_finbert_sentiment
 from src.features.finvader_sentiment import add_finvader_sentiment
+import argparse
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
@@ -72,5 +73,18 @@ def run_merge_pipeline(
 
     merged_df = merge_features(yf_df, reddit_agg, news_agg)
     merged_df.to_csv(output_path, index=False)
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Run feature merging pipeline")
+    parser.add_argument("--yf_path", type=str, required=True, help="Path to yfinance data CSV")
+    parser.add_argument("--reddit_path", type=str, required=True, help="Path to Reddit data CSV")
+    parser.add_argument("--news_path", type=str, required=True, help="Path to news data CSV")
+    parser.add_argument("--output_path", type=str, required=True, help="Output path for merged data CSV")
+
+    args = parser.parse_args()
+
+    run_merge_pipeline(args.yf_path, args.reddit_path, args.news_path, args.output_path)
+    logger.info("Feature merging pipeline completed successfully.")
 
 
