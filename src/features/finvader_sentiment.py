@@ -23,5 +23,6 @@ def add_finvader_sentiment(df: pd.DataFrame, text_col: str, prefix: str = "finva
     df[f"{prefix}_neg"] = scores.apply(lambda x: x["neg"])
     df[f"{prefix}_neu"] = scores.apply(lambda x: x["neu"])
     df[f"{prefix}_pos"] = scores.apply(lambda x: x["pos"])
+    df[f"{prefix}_score"] = df[f"{prefix}_pos"] - df[f"{prefix}_neg"]
     logger.info("FinVADER sentiment annotation completed.")
     return df

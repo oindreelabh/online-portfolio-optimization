@@ -84,7 +84,8 @@ def fetch_and_store_recent_reddit_posts(
     keywords=TICKERS,
     limit=1000,
     days=30,
-    filename="reddit_posts.csv"
+    filename="reddit_posts.csv",
+    raw_dir="data/raw"
 ):
     """
     Fetches recent Reddit posts and writes them to Neon DB.
@@ -96,7 +97,7 @@ def fetch_and_store_recent_reddit_posts(
         logger.info(f"Fetched {len(df)} Reddit posts.")
         df = preprocess_reddit(df)
         logger.info("Preprocessed Reddit posts.")
-        csv_path = write_df_to_csv(df, "../../data/raw", filename)
+        csv_path = write_df_to_csv(df, raw_dir, filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     else:
         logger.info("No new relevant Reddit posts found.")
@@ -105,6 +106,7 @@ if __name__ == "__main__":
     logger.info("Starting Reddit data fetching and storing...")
     parser = argparse.ArgumentParser(description="Fetch and store recent Reddit posts.")
     parser.add_argument("--filename", type=str, default="reddit_posts.csv", help="Filename to save the fetched posts")
+    parser.add_argument("--raw_dir", type=str, default="data/raw", help="Directory for raw data files")
     args = parser.parse_args()
 
     fetch_and_store_recent_reddit_posts(
@@ -112,6 +114,7 @@ if __name__ == "__main__":
         keywords=TICKERS,
         limit=1000,
         days=1,
-        filename=args.filename
+        filename=args.filename,
+        raw_dir=args.raw_dir
     )
     logger.info("Reddit data fetching and storing completed.")

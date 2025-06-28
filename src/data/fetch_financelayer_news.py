@@ -51,10 +51,10 @@ def fetch_financelayer_news(keywords, limit=100):
     df = preprocess_financelayer(df)
     return df
 
-def fetch_and_store_news(filename):
+def fetch_and_store_news(filename, raw_dir):
     df = fetch_financelayer_news(TICKERS, limit=100)
     if not df.empty:
-        csv_path = write_df_to_csv(df, "../../data/raw", filename)
+        csv_path = write_df_to_csv(df, raw_dir, filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     else:
         logger.info("No news data to store.")
@@ -62,7 +62,8 @@ def fetch_and_store_news(filename):
 if __name__ == "__main__":
     logger.info("Starting FinanceLayer news fetching and storing...")
     parser = argparse.ArgumentParser(description="Fetch and store FinanceLayer news data.")
-    parser.add_argument("--filename", type=str, default="financelayer_news.csv", help="Filename to save the fetched news")
+    parser.add_argument("--filename", type=str, help="Filename to save the fetched news")
+    parser.add_argument("--raw_dir", type=str, default="data/raw", help="Directory for raw data files")
     args = parser.parse_args()
-    fetch_and_store_news(args.filename)
+    fetch_and_store_news(args.filename, args.raw_dir)
     logger.info("FinanceLayer news fetching and storing completed.")

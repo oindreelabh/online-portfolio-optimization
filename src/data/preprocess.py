@@ -6,6 +6,7 @@ from nltk.corpus import stopwords
 import os
 import argparse
 from src.utils.logger import setup_logger
+from src.utils.helpers import write_df_to_csv
 
 stop_words = set(stopwords.words('english'))
 
@@ -44,12 +45,12 @@ def preprocess_financelayer(df: pd.DataFrame) -> pd.DataFrame:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Preprocess raw data files.")
-    parser.add_argument('--yfinance_y2', action='store_true', help="Preprocess yfinance data")
-    parser.add_argument('--yfinance_new', action='store_true', help="Preprocess yfinance recent data")
-    parser.add_argument('--reddit', action='store_true', help="Preprocess Reddit posts")
-    parser.add_argument('--financelayer', action='store_true', help="Preprocess FinanceLayer news")
-    parser.add_argument('--raw_dir', type=str, default='data/raw', help="Directory for raw data files")
-    parser.add_argument('--processed_dir', type=str, default='data/processed', help="Directory for processed data files")
+    parser.add_argument('--yfinance_y2', type=str, help="Preprocess yfinance data")
+    parser.add_argument('--yfinance_new', type=str, help="Preprocess yfinance recent data")
+    parser.add_argument('--reddit', type=str, help="Preprocess Reddit posts")
+    parser.add_argument('--financelayer', type=str, help="Preprocess FinanceLayer news")
+    parser.add_argument('--raw_dir', type=str, help="Directory for raw data files")
+    parser.add_argument('--processed_dir', type=str, help="Directory for processed data files")
     args = parser.parse_args()
 
     if not (args.yfinance_y2 or args.yfinance_new or args.reddit or args.financelayer):
@@ -60,21 +61,21 @@ if __name__ == "__main__":
         yf_df_recent = pd.read_csv(f'{args.raw_dir}/{args.yfinance_new}')
         yf_df_hist = preprocess_yfinance(yf_df_hist)
         yf_df_recent = preprocess_yfinance(yf_df_recent)
-        yf_df_hist.save(f'{args.processed_dir}/{args.yfinance_y2}', index=False)
-        yf_df_recent.save(f'{args.processed_dir}/{args.yfinance_new}', index=False)
+        write_df_to_csv(yf_df_hist, args.processed_dir, args.yfinance_y2)
+        write_df_to_csv(yf_df_recent, args.processed_dir, args.yfinance_new)
     except FileNotFoundError as e:
         logger.error(f"Error: {e}. Please ensure the raw data files exist in the specified path.")
 
     try:
         reddit_df = pd.read_csv(f'{args.raw_dir}/{args.reddit}')
         reddit_df = preprocess_reddit(reddit_df)
-        reddit_df.to_csv(f'{args.processed_dir}/{args.reddit}', index=False)
+        write_df_to_csv(reddit_df, args.processed_dir, args.reddit)
     except FileNotFoundError as e:
         logger.error(f"Error: {e}. Please ensure the raw Reddit posts file exists in the specified path.")
 
     try:
         finlayer_df = pd.read_csv(f'{args.raw_dir}/{args.financelayer}')
         finlayer_df = preprocess_financelayer(finlayer_df)
-        finlayer_df.to_csv(f'{args.processed_dir}/{args.financelayer}', index=False)
+        write_df_to_csv(finlayer_df, args.processed_dir, args.financelayer)
     except FileNotFoundError as e:
         logger.error(f"Error: {e}. Please ensure the raw FinanceLayer news file exists in the specified path.")
