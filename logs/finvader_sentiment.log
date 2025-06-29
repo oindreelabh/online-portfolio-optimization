@@ -52,3 +52,11 @@
 2025-06-29 21:10:02,087 - INFO - FinVADER sentiment annotation completed.
 2025-06-29 21:10:04,234 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
 2025-06-29 21:10:04,244 - INFO - FinVADER sentiment annotation completed.
+2025-06-29 21:23:55,688 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
+2025-06-29 21:23:55,708 - INFO - FinVADER sentiment annotation completed.
+2025-06-29 21:23:58,053 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
+2025-06-29 21:23:58,063 - INFO - FinVADER sentiment annotation completed.
+2025-06-29 21:38:27,750 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
+2025-06-29 21:38:28,411 - INFO - FinVADER sentiment annotation completed.
+2025-06-29 21:38:30,515 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
+2025-06-29 21:38:30,524 - INFO - FinVADER sentiment annotation completed.

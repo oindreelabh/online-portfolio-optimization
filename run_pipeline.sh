@@ -43,7 +43,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Step 23 Preprocessing data..."
+echo "Step 3: Preprocessing data..."
 python -m src.data.preprocess \
 --raw_dir $raw_dir \
 --processed_dir $processed_dir \

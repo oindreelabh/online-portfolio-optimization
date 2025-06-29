@@ -229,3 +229,51 @@
 2025-06-29 21:09:06,109 - WARNING - No posts found matching criteria.
 2025-06-29 21:09:06,109 - INFO - No new relevant Reddit posts found.
 2025-06-29 21:09:06,109 - INFO - Reddit data fetching and storing completed.
+2025-06-29 21:23:30,162 - INFO - Starting Reddit data fetching and storing...
+2025-06-29 21:23:31,163 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
+2025-06-29 21:23:31,163 - INFO - Fetching posts from r/stocks
+2025-06-29 21:23:33,312 - INFO - ran here 1
+2025-06-29 21:23:33,313 - INFO - ran here 2
+2025-06-29 21:23:33,313 - ERROR - Error fetching from r/stocks: 'list' object has no attribute 'lower'
+2025-06-29 21:23:33,313 - INFO - Fetching posts from r/wallstreetbets
+2025-06-29 21:23:34,943 - INFO - ran here 1
+2025-06-29 21:23:34,944 - INFO - ran here 2
+2025-06-29 21:23:34,944 - INFO - ran here 1
+2025-06-29 21:23:34,944 - INFO - ran here 2
+2025-06-29 21:23:34,945 - INFO - ran here 1
+2025-06-29 21:23:34,945 - INFO - ran here 2
+2025-06-29 21:23:34,945 - INFO - ran here 1
+2025-06-29 21:23:34,945 - INFO - ran here 2
+2025-06-29 21:23:34,945 - INFO - ran here 1
+2025-06-29 21:23:34,945 - INFO - ran here 2
+2025-06-29 21:23:34,945 - INFO - ran here 1
+2025-06-29 21:23:34,945 - INFO - ran here 2
+2025-06-29 21:23:34,945 - INFO - ran here 1
+2025-06-29 21:23:34,945 - INFO - ran here 2
+2025-06-29 21:23:34,945 - ERROR - Error fetching from r/wallstreetbets: 'list' object has no attribute 'lower'
+2025-06-29 21:23:34,946 - INFO - Fetching posts from r/investing
+2025-06-29 21:23:36,229 - INFO - ran here 1
+2025-06-29 21:23:36,230 - INFO - ran here 2
+2025-06-29 21:23:36,230 - ERROR - Error fetching from r/investing: 'list' object has no attribute 'lower'
+2025-06-29 21:23:36,230 - INFO - Fetching posts from r/stockmarket
+2025-06-29 21:23:38,670 - INFO - ran here 1
+2025-06-29 21:23:38,670 - INFO - ran here 2
+2025-06-29 21:23:38,670 - ERROR - Error fetching from r/stockmarket: 'list' object has no attribute 'lower'
+2025-06-29 21:23:38,670 - INFO - Fetching posts from r/pennystocks
+2025-06-29 21:23:41,064 - INFO - ran here 1
+2025-06-29 21:23:41,064 - INFO - ran here 2
+2025-06-29 21:23:41,064 - ERROR - Error fetching from r/pennystocks: 'list' object has no attribute 'lower'
+2025-06-29 21:23:41,064 - WARNING - No posts found matching criteria.
+2025-06-29 21:23:41,065 - INFO - No new relevant Reddit posts found.
+2025-06-29 21:23:41,065 - INFO - Reddit data fetching and storing completed.
+2025-06-29 21:28:40,389 - INFO - Starting Reddit data fetching and storing...
+2025-06-29 21:28:41,431 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
+2025-06-29 21:28:41,431 - INFO - Fetching posts from r/stocks
+2025-06-29 21:31:53,674 - INFO - Fetching posts from r/wallstreetbets
+2025-06-29 21:34:36,211 - INFO - Fetching posts from r/investing
+2025-06-29 21:35:32,286 - INFO - Fetching posts from r/stockmarket
+2025-06-29 21:36:25,720 - INFO - Fetching posts from r/pennystocks
+2025-06-29 21:37:29,048 - INFO - Fetched 541 Reddit posts.
+2025-06-29 21:37:29,107 - INFO - Preprocessed Reddit posts.
+2025-06-29 21:37:29,131 - INFO - Latest data written successfully to data/raw/reddit_posts.csv.
+2025-06-29 21:37:29,132 - INFO - Reddit data fetching and storing completed.

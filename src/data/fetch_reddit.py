@@ -43,8 +43,11 @@ def fetch_recent_posts(subreddits, ticker_mapping, limit=500, days=30):
                     name.lower() for names in ticker_mapping.values() for name in names]
                 if any(kw.lower() in text for kw in keywords):
                     # Find which tickers are mentioned
-                    mentioned_tickers = [k for k in ticker_mapping if k.lower() in text or ticker_mapping[k].lower() in text]
-
+                    mentioned_tickers = [
+                        k for k in ticker_mapping
+                        if
+                        k.lower() in text.lower() or any(alias.lower() in text.lower() for alias in ticker_mapping[k])
+                    ]
                     # Fetch and sort comments by upvotes (score)
                     submission.comments.replace_more(limit=0)
                     comments = submission.comments.list()
