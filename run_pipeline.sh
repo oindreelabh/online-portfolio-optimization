@@ -32,7 +32,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Step 2: Preprocessing data..."
+echo "Step 2: Adding Technical Indicators..."
+python -m src.features.build_ta_features \
+--input_file_y2 $yFinance_historical \
+--input_file_new $yFinance_latest \
+--raw_dir $raw_dir \
+--processed_dir $processed_dir
+if [ $? -ne 0 ]; then
+    echo "Error adding Technical indicators data. Exiting."
+    exit 1
+fi
+
+echo "Step 23 Preprocessing data..."
 python -m src.data.preprocess \
 --raw_dir $raw_dir \
 --processed_dir $processed_dir \
@@ -45,7 +56,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Step 3: Creating sentiment features..."
+echo "Step 4: Creating sentiment features..."
 python -m src.features.merge_features \
 --yf_path $processed_dir/$yFinance_latest \
 --reddit_path $processed_dir/$reddit \
@@ -57,7 +68,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Step 4: Running LSTM model on 2 years of yfinance data..."
+echo "Step 5: Running LSTM model on 2 years of yfinance data..."
 python -m src.model.lstm_hybrid \
 --data_path $processed_dir/$yFinance_historical \
 --model_save_path $model_dir/lstm_model.keras

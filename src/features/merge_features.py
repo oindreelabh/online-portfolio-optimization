@@ -15,7 +15,7 @@ def add_dual_sentiment(input_df: pd.DataFrame, text_col: str, sentiment_prefix: 
     """
     logger.info("Applying FinBERT sentiment...")
     df = add_finbert_sentiment(input_df, text_col, prefix="finbert")
-    logger.info("Applying Llama-2 financial sentiment...")
+    logger.info("Applying finvader financial sentiment...")
     df = add_finvader_sentiment(df, text_col, prefix="finvader")
     logger.info("Calculating average sentiment score...")
     df[f"{sentiment_prefix}_sentiment_score"] = df[["finbert_score", "finvader_score"]].mean(axis=1)
@@ -43,7 +43,6 @@ def merge_features(yf_df: pd.DataFrame, reddit_agg: pd.DataFrame, news_agg: pd.D
     """
     Merge yfinance data with aggregated Reddit and news sentiment scores.
     """
-    # Ensure 'ticker' and 'date' columns are in datetime format for merging
     yf_df['date'] = pd.to_datetime(yf_df['date'])
     reddit_agg['date'] = pd.to_datetime(reddit_agg['date'])
     news_agg['date'] = pd.to_datetime(news_agg['date'])
@@ -61,7 +60,6 @@ def run_merge_pipeline(
     Load CSVs, aggregate sentiment, merge, and save to output_path.
     Handles 'tickers' column in reddit and news data.
     """
-    # Ensure 'tickers' column is loaded as list, and parse 'date' as datetime
     yf_df = pd.read_csv(yf_path, parse_dates=['date'])
     reddit_df = pd.read_csv(reddit_path, converters={'tickers': eval}, parse_dates=['date'])
     news_df = pd.read_csv(news_path, converters={'tickers': eval}, parse_dates=['date'])

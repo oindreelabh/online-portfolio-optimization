@@ -118,7 +118,7 @@ if __name__ == "__main__":
         subreddits=SUBREDDITS,
         ticker_dict=ticker_map,
         limit=1000,
-        days=1,
+        days=30,
         filename=args.filename,
         raw_dir=args.raw_dir
     )

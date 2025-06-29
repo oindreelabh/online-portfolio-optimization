@@ -57,8 +57,8 @@ if __name__ == "__main__":
         parser.error("At least one of --yfinance_y2, --yfinance_new, --reddit, or --financelayer must be specified.")
 
     try:
-        yf_df_hist = pd.read_csv(f'{args.raw_dir}/{args.yfinance_y2}')
-        yf_df_recent = pd.read_csv(f'{args.raw_dir}/{args.yfinance_new}')
+        yf_df_hist = pd.read_csv(f'{args.processed_dir}/{args.yfinance_y2}')
+        yf_df_recent = pd.read_csv(f'{args.processed_dir}/{args.yfinance_new}')
         yf_df_hist = preprocess_yfinance(yf_df_hist)
         yf_df_recent = preprocess_yfinance(yf_df_recent)
         write_df_to_csv(yf_df_hist, args.processed_dir, args.yfinance_y2)
