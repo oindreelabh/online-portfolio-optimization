@@ -60,7 +60,7 @@ fi
 echo "Step 4: Running LSTM model on 2 years of yfinance data..."
 python -m src.model.lstm_hybrid \
 --data_path $processed_dir/$yFinance_historical \
---model_save_path $model_dir/lstm_model.h5
+--model_save_path $model_dir/lstm_model.keras
 
 if [ $? -ne 0 ]; then
     echo "Error running LSTM model. Exiting."

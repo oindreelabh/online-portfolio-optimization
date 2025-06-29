@@ -1,0 +1,6 @@
+2025-06-29 14:52:44,138 - INFO - Requesting metadata for 12 tickers from OpenFIGI
+2025-06-29 14:52:45,540 - INFO - Saved fallback OpenFIGI mapping to data/raw/ticker_keyword_map.csv
+2025-06-29 15:02:30,426 - INFO - Requesting metadata for 12 tickers from OpenFIGI
+2025-06-29 15:02:31,560 - INFO - Saved fallback OpenFIGI mapping to data/raw/ticker_keyword_map.csv
+2025-06-29 15:05:19,756 - INFO - Requesting metadata for 12 tickers from OpenFIGI
+2025-06-29 15:05:20,898 - INFO - Saved fallback OpenFIGI mapping to data/raw/ticker_keyword_map.csv

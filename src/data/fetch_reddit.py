@@ -9,6 +9,7 @@ from src.data.preprocess import preprocess_reddit
 from src.utils.constants import TICKERS, SUBREDDITS
 from src.utils.logger import setup_logger
 from src.utils.helpers import write_df_to_csv
+from src.utils.ticker_dict import build_ticker_keyword_map_openfigi
 
 load_dotenv()  # Load env vars from .env file
 
@@ -20,7 +21,7 @@ reddit = praw.Reddit(
     user_agent=os.getenv("REDDIT_USER_AGENT")
 )
 
-def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
+def fetch_recent_posts(subreddits, ticker_mapping, limit=500, days=30):
     """
     Fetch recent Reddit submissions from given subreddits containing any of the keywords
     within the last `days` days. Concatenates title, selftext, and top 10 comments (by upvotes) into one text field.
@@ -38,9 +39,11 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
                     continue  # Ignore older posts
                 # Combine title and selftext for keyword search
                 text = (submission.title + " " + submission.selftext).lower()
+                keywords = [t.lower() for t in ticker_mapping.keys()] + [
+                    name.lower() for names in ticker_mapping.values() for name in names]
                 if any(kw.lower() in text for kw in keywords):
                     # Find which tickers are mentioned
-                    mentioned_tickers = [kw for kw in keywords if kw.lower() in text]
+                    mentioned_tickers = [k for k in ticker_mapping if k.lower() in text or ticker_mapping[k].lower() in text]
 
                     # Fetch and sort comments by upvotes (score)
                     submission.comments.replace_more(limit=0)
@@ -80,19 +83,19 @@ def fetch_recent_posts(subreddits, keywords, limit=500, days=30):
     return df
 
 def fetch_and_store_recent_reddit_posts(
-    subreddits=SUBREDDITS,
-    keywords=TICKERS,
-    limit=1000,
-    days=30,
-    filename="reddit_posts.csv",
-    raw_dir="data/raw"
+    subreddits,
+    ticker_dict,
+    limit,
+    days,
+    filename,
+    raw_dir
 ):
     """
     Fetches recent Reddit posts and writes them to Neon DB.
     Designed for Airflow or other programmatic use.
     """
     logger.info(f"Starting fetch_and_store_recent_reddit_posts for last {days} days, limit {limit}")
-    df = fetch_recent_posts(subreddits=subreddits, keywords=keywords, limit=limit, days=days)
+    df = fetch_recent_posts(subreddits=subreddits, ticker_mapping=ticker_dict, limit=limit, days=days)
     if not df.empty:
         logger.info(f"Fetched {len(df)} Reddit posts.")
         df = preprocess_reddit(df)
@@ -109,9 +112,11 @@ if __name__ == "__main__":
     parser.add_argument("--raw_dir", type=str, default="data/raw", help="Directory for raw data files")
     args = parser.parse_args()
 
+    ticker_map = build_ticker_keyword_map_openfigi(TICKERS, args.raw_dir)
+
     fetch_and_store_recent_reddit_posts(
         subreddits=SUBREDDITS,
-        keywords=TICKERS,
+        ticker_dict=ticker_map,
         limit=1000,
         days=1,
         filename=args.filename,

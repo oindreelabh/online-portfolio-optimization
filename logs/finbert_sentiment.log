@@ -31,3 +31,15 @@
 2025-06-28 21:58:39,646 - INFO - Using FinBERT model: ProsusAI/finbert
 2025-06-28 21:58:39,647 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
 2025-06-28 21:58:39,647 - INFO - Label Count: 3
+2025-06-29 12:21:12,161 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-06-29 12:21:12,161 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-06-29 12:21:12,161 - INFO - Label Count: 3
+2025-06-29 12:54:54,622 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-06-29 12:54:54,623 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-06-29 12:54:54,623 - INFO - Label Count: 3
+2025-06-29 15:03:16,135 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-06-29 15:03:16,138 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-06-29 15:03:16,138 - INFO - Label Count: 3
+2025-06-29 15:06:00,989 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-06-29 15:06:00,992 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-06-29 15:06:00,992 - INFO - Label Count: 3

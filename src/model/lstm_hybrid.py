@@ -11,7 +11,7 @@ import joblib
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
-def train_lstm_model(data, feature_col, target_col, lookback=10, epochs=10, batch_size=16, model_save_path="lstm_model.h5"):
+def train_lstm_model(data, feature_col, target_col, lookback=10, epochs=10, batch_size=16, model_save_path="lstm_model.keras"):
     logger.info("Preparing data for LSTM...")
     scaler = MinMaxScaler()
     data_scaled = scaler.fit_transform(data[[feature_col, target_col]])
@@ -30,7 +30,7 @@ def train_lstm_model(data, feature_col, target_col, lookback=10, epochs=10, batc
     model.fit(X, y, epochs=epochs, batch_size=batch_size, verbose=1)
     model.save(model_save_path)
     logger.info(f"LSTM model trained and saved to {model_save_path}")
-    joblib.dump(scaler, model_save_path.replace('.h5', '_scaler.pkl'))
+    joblib.dump(scaler, model_save_path.replace('.keras', '_scaler.pkl'))
     return model_save_path
 
 def predict_lstm(model_path, scaler_path, recent_data, lookback=10):
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument("--lookback", type=int, default=10, help="Lookback period for LSTM")
     parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size for training")
-    parser.add_argument("--model_save_path", type=str, default="lstm_model.h5", help="Path to save the trained model")
+    parser.add_argument("--model_save_path", type=str, help="Path to save the trained model")
 
     args = parser.parse_args()
 

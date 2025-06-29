@@ -1,7 +1,7 @@
 TICKERS = [
     "AAPL", "TSLA", "AMZN", "MSFT", "NVDA",
-    "GME", "AMC", "META","JPM", "SPY", "GOOG"
-    "UNH", "C", "GOOGL"
+    "GME", "AMC", "META","JPM", "SPY",
+    "UNH", "GOOGL"
 ]
 
 SUBREDDITS = [
