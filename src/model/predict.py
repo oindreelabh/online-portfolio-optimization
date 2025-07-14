@@ -2,6 +2,7 @@ import numpy as np
 from keras.models import load_model
 import pandas as pd
 import joblib
+from src.model.online_learning import OnlineGradientDescentMomentum
 
 def load_lstm_model(model_path, scaler_path):
     model = load_model(model_path)
@@ -27,6 +28,15 @@ def predict_next(model, scaler, feature_cols, target_col, recent_data, sequence_
     pred_actual = scaler.inverse_transform(dummy)[0, -1]
     return pred_actual
 
+def load_online_model(model_path, n_features):
+    model = OnlineGradientDescentMomentum(n_features=n_features, model_path=model_path)
+    return model
+
+def predict_online(model, feature_cols, recent_data):
+    X = recent_data[feature_cols].values
+    preds = model.predict(X)
+    return preds[-1]  # last prediction
+
 def suggest_rebalance(predictions, current_allocations):
     # predictions: dict {ticker: predicted_return}
     # current_allocations: dict {ticker: current_weight}
@@ -34,9 +44,33 @@ def suggest_rebalance(predictions, current_allocations):
     suggested = {t: 1.0/len(predictions) for t in sorted_tickers}  # equal weight as example
     return suggested
 
+def hybrid_predict_and_rebalance(recent_data, lstm_model_path, lstm_scaler_path, online_model_path, tickers, current_allocations, sequence_length=10):
+    lstm_model, scaler, feature_cols, target_col = load_lstm_model(lstm_model_path, lstm_scaler_path)
+    online_model = load_online_model(online_model_path, n_features=len(feature_cols))
+    hybrid_preds = {}
+    for ticker in tickers:
+        ticker_data = recent_data[recent_data['ticker'] == ticker]
+        if len(ticker_data) < sequence_length:
+            continue
+        lstm_pred = predict_next(lstm_model, scaler, feature_cols, target_col, ticker_data, sequence_length)
+        online_pred = predict_online(online_model, feature_cols, ticker_data)
+        # Combine predictions (simple average, can be weighted)
+        hybrid_pred = (lstm_pred + online_pred) / 2
+        hybrid_preds[ticker] = hybrid_pred
+    suggested = suggest_rebalance(hybrid_preds, current_allocations)
+    return suggested
+
 # testing
 recent_data = pd.read_csv("../../data/processed/stock_prices_latest.csv")
-model, scaler, feature_cols, target_col = load_lstm_model('../../models/lstm_model.keras', '../../models/lstm_model_scaler.pkl')
-pred = predict_next(model, scaler, feature_cols, target_col, recent_data)
-rebalance = suggest_rebalance({'AAPL': 0.02, 'TSLA': 0.01}, {'AAPL': 0.7, 'TSLA': 0.3})
-print(rebalance)
+tickers = recent_data['ticker'].unique()
+current_allocations = {'AAPL': 0.7, 'TSLA': 0.3}  # example
+suggested = hybrid_predict_and_rebalance(
+    recent_data,
+    '../../models/lstm_model.keras',
+    '../../models/lstm_model_scaler.pkl',
+    '../../models/ogdm_model.pkl',
+    tickers,
+    current_allocations,
+    sequence_length=10
+)
+print(suggested)

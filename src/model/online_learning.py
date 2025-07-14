@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import joblib
+import argparse
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
@@ -57,39 +58,46 @@ class OnlineGradientDescentMomentum:
         logger.info(f"Model loaded from {path}.")
 
 
-def load_data(data_path, feature_cols, target_col):
+def load_data(data_path, target_col):
     logger.info(f"Loading data from {data_path}")
     df = pd.read_csv(data_path)
-    X = df[feature_cols].fillna(0).values
-    y = df[target_col].fillna(0).values
-    logger.info(f"Loaded {len(df)} records with {len(feature_cols)} features.")
-    return X, y, df
+    # Select only numeric columns except the target
+    feature_cols = [col for col in df.select_dtypes(include=[np.number]).columns if col != target_col]
+    logger.info(f"Numeric feature columns: {feature_cols}")
+    X = df[feature_cols].fillna(0).to_numpy()
+    y = df[target_col].fillna(0).to_numpy()
+    logger.info(f"Loaded {len(df)} records with {len(feature_cols)} numeric features.")
+    return X, y
 
 
 def run_ogdm_training(
     data_path: str,
-    feature_cols: list,
     target_col: str,
     model_path: str,
     learning_rate: float = 0.01,
     momentum: float = 0.9
 ):
-    X, y, _ = load_data(data_path, feature_cols, target_col)
+    X, y = load_data(data_path, target_col)
     model = OnlineGradientDescentMomentum(n_features=X.shape[1], learning_rate=learning_rate, momentum=momentum, model_path=model_path)
     model.partial_fit(X, y)
     model.save(model_path)
     logger.info("OGDM training step completed and model saved.")
-    return model_path
 
+if __name__ == "__main__":
 
-def run_ogdm_prediction(
-    data_path: str,
-    feature_cols: list,
-    model_path: str
-):
-    X, _, df = load_data(data_path, feature_cols, target_col=None)
-    model = OnlineGradientDescentMomentum(n_features=X.shape[1], model_path=model_path)
-    preds = model.predict(X)
-    df['predicted_weights'] = preds
-    logger.info("OGDM prediction completed.")
-    return df
+    parser = argparse.ArgumentParser(description="Run Online Gradient Descent Momentum training and prediction")
+    parser.add_argument("--data_path", type=str, required=True, help="Path to input data CSV")
+    parser.add_argument("--target_col", type=str, required=True, help="Target column name")
+    parser.add_argument("--model_path", type=str, required=True, help="Path to save the trained model")
+    parser.add_argument("--learning_rate", type=float, default=0.01, help="Learning rate for OGDM")
+    parser.add_argument("--momentum", type=float, default=0.9, help="Momentum factor for OGDM")
+
+    args = parser.parse_args()
+
+    run_ogdm_training(
+        args.data_path,
+        args.target_col,
+        args.model_path,
+        args.learning_rate,
+        args.momentum
+    )
