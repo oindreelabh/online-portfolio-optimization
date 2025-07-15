@@ -71,24 +71,24 @@ ogdm_model_name="ogdm_model.pkl"
 #    exit 1
 #fi
 
-#echo "Step 5: Running LSTM model on 2 years of yfinance data..."
-#python -m src.model.lstm_hybrid \
-#--data_path $processed_dir/$yFinance_historical \
-#--model_save_path $model_dir/$lstm_model_name
-#
-#if [ $? -ne 0 ]; then
-#    echo "Error running LSTM model. Exiting."
-#    exit 1
-#fi
+echo "Step 5: Running LSTM model on 2 years of yfinance data..."
+python -m src.model.lstm_hybrid \
+--data_path $processed_dir/$yFinance_historical \
+--model_save_path $model_dir/$lstm_model_name
 
-echo "Step 5: Running online learning model on recent data with sentiment features..."
-python -m src.model.online_learning \
---data_path $processed_dir/$recent_merged \
---model_path $model_dir/$ogdm_model_name \
---target_col "returns"
 if [ $? -ne 0 ]; then
-    echo "Error running OGDM model. Exiting."
+    echo "Error running LSTM model. Exiting."
     exit 1
 fi
+
+#echo "Step 5: Running online learning model on recent data with sentiment features..."
+#python -m src.model.online_learning \
+#--data_path $processed_dir/$recent_merged \
+#--model_path $model_dir/$ogdm_model_name \
+#--target_col "returns"
+#if [ $? -ne 0 ]; then
+#    echo "Error running OGDM model. Exiting."
+#    exit 1
+#fi
 
 echo "Pipeline completed successfully."

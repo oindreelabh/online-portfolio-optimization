@@ -1,0 +1,21 @@
+2025-07-15 22:11:48,291 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,291 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,311 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,312 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,332 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,332 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,332 - INFO - Not enough data for GME to make predictions. Skipping.
+2025-07-15 22:11:48,333 - INFO - Not enough data for GOOGL to make predictions. Skipping.
+2025-07-15 22:11:48,352 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,352 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,375 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,376 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,398 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,398 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,398 - INFO - Not enough data for NVDA to make predictions. Skipping.
+2025-07-15 22:11:48,421 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,422 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,422 - INFO - Not enough data for TSLA to make predictions. Skipping.
+2025-07-15 22:11:48,444 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-07-15 22:11:48,444 - INFO - Padded features from 13 to 15
+2025-07-15 22:11:48,444 - INFO - Sorted tickers by predicted returns: ['AAPL', 'AMC', 'AMZN', 'SPY', 'MSFT', 'META', 'JPM', 'UNH']
