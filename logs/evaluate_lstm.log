@@ -1,0 +1,19 @@
+2025-07-17 14:39:16,078 - INFO - Evaluating LSTM model for AAPL
+2025-07-17 14:49:13,680 - WARNING - Found 139 NaN values in test data, filling with zeros
+2025-07-17 14:49:13,682 - INFO - Evaluating LSTM model for AAPL
+2025-07-17 14:49:14,477 - INFO - Evaluating LSTM model for AMC
+2025-07-17 14:49:14,477 - WARNING - Not enough data for AMC (need > 5 rows)
+2025-07-17 14:49:14,477 - INFO - Evaluating LSTM model for AMZN
+2025-07-17 14:49:14,603 - INFO - Evaluating LSTM model for GME
+2025-07-17 14:49:14,603 - WARNING - Not enough data for GME (need > 5 rows)
+2025-07-17 14:49:14,603 - INFO - Evaluating LSTM model for GOOGL
+2025-07-17 14:49:14,603 - WARNING - Not enough data for GOOGL (need > 5 rows)
+2025-07-17 14:49:14,603 - INFO - Evaluating LSTM model for JPM
+2025-07-17 14:49:14,659 - INFO - Evaluating LSTM model for META
+2025-07-17 14:49:14,717 - INFO - Evaluating LSTM model for MSFT
+2025-07-17 14:49:14,775 - INFO - Evaluating LSTM model for NVDA
+2025-07-17 14:49:14,775 - WARNING - Not enough data for NVDA (need > 5 rows)
+2025-07-17 14:49:14,775 - INFO - Evaluating LSTM model for SPY
+2025-07-17 14:49:14,831 - INFO - Evaluating LSTM model for TSLA
+2025-07-17 14:49:14,831 - WARNING - Not enough data for TSLA (need > 5 rows)
+2025-07-17 14:49:14,831 - INFO - Evaluating LSTM model for UNH

@@ -58,3 +58,84 @@
 2025-07-15 22:11:48,398 - INFO - Made predictions for 8 samples.
 2025-07-15 22:11:48,422 - INFO - Made predictions for 8 samples.
 2025-07-15 22:11:48,444 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:23,968 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 13:47:24,099 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:24,120 - INFO - Made predictions for 5 samples.
+2025-07-17 13:47:24,140 - INFO - Made predictions for 7 samples.
+2025-07-17 13:47:24,160 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:24,181 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:24,212 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:24,245 - INFO - Made predictions for 8 samples.
+2025-07-17 13:47:24,268 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:36,721 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 13:48:36,864 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:36,885 - INFO - Made predictions for 5 samples.
+2025-07-17 13:48:36,906 - INFO - Made predictions for 7 samples.
+2025-07-17 13:48:36,926 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:36,951 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:36,978 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:37,003 - INFO - Made predictions for 8 samples.
+2025-07-17 13:48:37,026 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:11,847 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 13:49:11,988 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:12,008 - INFO - Made predictions for 5 samples.
+2025-07-17 13:49:12,029 - INFO - Made predictions for 7 samples.
+2025-07-17 13:49:12,048 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:12,070 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:12,095 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:12,120 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:12,143 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,626 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 13:49:43,768 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,790 - INFO - Made predictions for 5 samples.
+2025-07-17 13:49:43,810 - INFO - Made predictions for 7 samples.
+2025-07-17 13:49:43,830 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,853 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,875 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,898 - INFO - Made predictions for 8 samples.
+2025-07-17 13:49:43,919 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:37,743 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 13:53:37,918 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:37,939 - INFO - Made predictions for 5 samples.
+2025-07-17 13:53:37,960 - INFO - Made predictions for 7 samples.
+2025-07-17 13:53:37,982 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:38,002 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:38,023 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:38,044 - INFO - Made predictions for 8 samples.
+2025-07-17 13:53:38,065 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:25,649 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 14:18:25,881 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:25,906 - INFO - Made predictions for 5 samples.
+2025-07-17 14:18:25,932 - INFO - Made predictions for 7 samples.
+2025-07-17 14:18:25,954 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:25,976 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:25,998 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:26,024 - INFO - Made predictions for 8 samples.
+2025-07-17 14:18:26,046 - INFO - Made predictions for 8 samples.
+2025-07-17 14:20:36,335 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 14:22:33,022 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 14:22:33,169 - INFO - Made predictions for 8 samples.
+2025-07-17 14:22:33,192 - INFO - Made predictions for 5 samples.
+2025-07-17 14:22:33,213 - INFO - Made predictions for 7 samples.
+2025-07-17 14:22:33,234 - INFO - Made predictions for 8 samples.
+2025-07-17 14:22:33,254 - INFO - Made predictions for 8 samples.
+2025-07-17 14:22:33,275 - INFO - Made predictions for 8 samples.
+2025-07-17 14:22:33,296 - INFO - Made predictions for 8 samples.
+2025-07-17 14:22:33,317 - INFO - Made predictions for 8 samples.
+2025-07-17 14:26:43,950 - INFO - Loading data from data/processed/recent_data_with_sentiment.csv
+2025-07-17 14:26:43,952 - INFO - Numeric feature columns: ['open', 'high', 'low', 'volume', 'returns', 'rsi', 'macd', 'macd_signal', 'sma_20', 'ema_20', 'bb_bbm', 'bb_bbh', 'bb_bbl', 'reddit_sentiment_score', 'news_sentiment_score']
+2025-07-17 14:26:43,953 - INFO - Loaded 76 records with 15 numeric features.
+2025-07-17 14:26:43,953 - INFO - Model loaded from models/ogdm_model.pkl.
+2025-07-17 14:26:43,954 - INFO - Made predictions for 76 samples.
+2025-07-17 14:26:43,954 - INFO - Performed partial_fit step with momentum.
+2025-07-17 14:26:43,954 - INFO - Model saved to models/ogdm_model.pkl.
+2025-07-17 14:26:43,955 - INFO - OGDM training step completed and model saved.
+2025-07-17 14:27:05,754 - INFO - Model loaded from ../../models/ogdm_model.pkl.
+2025-07-17 14:27:05,896 - INFO - Made predictions for 8 samples.
+2025-07-17 14:27:05,918 - INFO - Made predictions for 5 samples.
+2025-07-17 14:27:05,939 - INFO - Made predictions for 7 samples.
+2025-07-17 14:27:05,959 - INFO - Made predictions for 8 samples.
+2025-07-17 14:27:05,979 - INFO - Made predictions for 8 samples.
+2025-07-17 14:27:06,000 - INFO - Made predictions for 8 samples.
+2025-07-17 14:27:06,021 - INFO - Made predictions for 8 samples.
+2025-07-17 14:27:06,041 - INFO - Made predictions for 8 samples.

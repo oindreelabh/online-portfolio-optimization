@@ -19,17 +19,26 @@ def load_lstm_model(model_path, scaler_path):
 def predict_next(model, scaler, feature_cols, recent_data, sequence_length=10):
     # recent_data: DataFrame with latest `sequence_length` rows
     X_features = recent_data[feature_cols].values[-sequence_length:]
+
     # Stack dummy target column for scaling
     dummy_target = np.zeros((sequence_length, 1))
     recent_for_scaling = np.hstack([X_features, dummy_target])
-    recent_scaled = scaler.transform(recent_for_scaling)[:, :-1]
+
+    all_cols = feature_cols + ['close']
+    recent_for_scaling_df = pd.DataFrame(recent_for_scaling, columns=all_cols)
+    recent_scaled_df = pd.DataFrame(scaler.transform(recent_for_scaling_df), columns=all_cols)
+    recent_scaled = recent_scaled_df.iloc[:, :-1].values
+
     X = recent_scaled.reshape(1, sequence_length, len(feature_cols))
     pred_scaled = model.predict(X)
-    # Inverse transform to get actual value
-    dummy = np.zeros((1, len(feature_cols) + 1))
-    dummy[0, :-1] = recent_scaled[-1]
-    dummy[0, -1] = pred_scaled
-    pred_actual = scaler.inverse_transform(dummy)[0, -1]
+    pred_value = pred_scaled.item()
+
+    # Inverse transform to get the actual prediction
+    dummy_df = pd.DataFrame(np.zeros((1, len(feature_cols) + 1)), columns=all_cols)
+    dummy_df.iloc[0, :-1] = recent_scaled[-1]
+    dummy_df.iloc[0, -1] = pred_value
+    pred_actual = scaler.inverse_transform(dummy_df)[0, -1]
+
     return pred_actual
 
 def load_online_model(model_path, n_features):
@@ -89,7 +98,7 @@ def suggest_rebalance(predictions, current_allocations):
 
     # Normalize to ensure weights sum to 1
     total_weight = sum(suggested.values())
-    suggested = {t: w/total_weight for t, w in suggested.items()}
+    suggested = {t: round(w/total_weight, 2) for t, w in suggested.items()}
 
     return suggested
 

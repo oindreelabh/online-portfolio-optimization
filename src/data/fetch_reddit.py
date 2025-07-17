@@ -93,10 +93,6 @@ def fetch_and_store_recent_reddit_posts(
     filename,
     raw_dir
 ):
-    """
-    Fetches recent Reddit posts and writes them to Neon DB.
-    Designed for Airflow or other programmatic use.
-    """
     logger.info(f"Starting fetch_and_store_recent_reddit_posts for last {days} days, limit {limit}")
     df = fetch_recent_posts(subreddits=subreddits, ticker_mapping=ticker_dict, limit=limit, days=days)
     if not df.empty:
