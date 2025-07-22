@@ -61,7 +61,7 @@ class OnlineGradientDescentMomentum:
 def load_data(data_path, target_col):
     logger.info(f"Loading data from {data_path}")
     df = pd.read_csv(data_path)
-    # Select only numeric columns except the target
+    # Selecting only numeric columns except the target
     feature_cols = [col for col in df.select_dtypes(include=[np.number]).columns if col != target_col]
     logger.info(f"Numeric feature columns: {feature_cols}")
     X = df[feature_cols].fillna(0).to_numpy()

@@ -12,7 +12,7 @@ stop_words = set(stopwords.words('english'))
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
-def preprocess_yfinance(df: pd.DataFrame) -> pd.DataFrame:
+def preprocess_yfinance(df: pd.DataFrame):
     # Fill missing values, calculate returns, remove outliers, etc.
     df['date'] = pd.to_datetime(df['date'])
     df = df.sort_values(['ticker', 'date'])

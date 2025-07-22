@@ -16,21 +16,20 @@ logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 def train_lstm_model(data, target_col, lookback=5, epochs=10, batch_size=16, model_save_path="lstm_model.keras"):
     logger.info("Preparing data for LSTM...")
 
-    # Use all columns except 'date', 'ticker', and target as features
     feature_cols = [col for col in data.columns if col not in ['date', 'ticker', target_col]]
     all_cols = feature_cols + [target_col]
 
-    # Check for NaN values before scaling
+    # Checking for NaN values before scaling
     if data[all_cols].isna().any().any():
         logger.warning("Found NaN values in data. Filling with zeros.")
         data[all_cols] = data[all_cols].fillna(0)
 
-    # Check for infinite values
+    # Checking for infinite values
     if np.isinf(data[all_cols].values).any():
         logger.warning("Found infinite values in data. Replacing with large finite values.")
         data[all_cols] = data[all_cols].replace([np.inf, -np.inf], np.finfo(np.float64).max)
 
-    # Robust scaling to handle outliers better
+    # Scaling to handle outliers better
     scaler = MinMaxScaler(feature_range=(-1, 1))
     data_scaled = scaler.fit_transform(data[all_cols])
 
@@ -43,7 +42,7 @@ def train_lstm_model(data, target_col, lookback=5, epochs=10, batch_size=16, mod
     logger.info("Building LSTM model...")
     model = Sequential([
         LSTM(50, input_shape=(X.shape[1], X.shape[2]),
-             recurrent_dropout=0.2,  # Add dropout to prevent overfitting
+             recurrent_dropout=0.2,  # Adding dropout to prevent overfitting
              return_sequences=False),
         Dense(1)
     ])
