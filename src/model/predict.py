@@ -3,6 +3,9 @@ from keras.models import load_model
 import pandas as pd
 import joblib
 import os
+import argparse
+import json
+import sys
 from src.utils.logger import setup_logger
 from src.model.online_learning import OnlineGradientDescentMomentum
 
@@ -84,6 +87,7 @@ def suggest_rebalance(predictions, current_allocations):
 
     # Limit how much we can change from current allocation (max 20% adjustment)
     max_change_pct = 0.20
+    max_allocation = 0.25  # Diversification constraint: no single holding > 25%
     suggested = {}
 
     # Calculate suggested allocations based on both predictions and current weights
@@ -94,42 +98,185 @@ def suggest_rebalance(predictions, current_allocations):
 
         # Adjust weight considering current allocation (blend of current and target)
         adjustment = (target - current) * max_change_pct
-        suggested[ticker] = current + adjustment
+        suggested_weight = current + adjustment
+        
+        # Apply diversification constraint
+        suggested[ticker] = min(suggested_weight, max_allocation)
 
     # Normalize to ensure weights sum to 1
     total_weight = sum(suggested.values())
     suggested = {t: round(w/total_weight, 2) for t, w in suggested.items()}
+    
+    # Final check and redistribution if any allocation still exceeds 25% after normalization
+    while any(weight > max_allocation for weight in suggested.values()):
+        excess_total = 0
+        compliant_tickers = []
+        
+        for ticker, weight in suggested.items():
+            if weight > max_allocation:
+                excess = weight - max_allocation
+                excess_total += excess
+                suggested[ticker] = max_allocation
+            else:
+                compliant_tickers.append(ticker)
+        
+        # Redistribute excess to compliant tickers proportionally
+        if compliant_tickers and excess_total > 0:
+            compliant_total = sum(suggested[t] for t in compliant_tickers)
+            if compliant_total > 0:
+                for ticker in compliant_tickers:
+                    additional = (suggested[ticker] / compliant_total) * excess_total
+                    suggested[ticker] = min(suggested[ticker] + additional, max_allocation)
+        else:
+            # If no compliant tickers, distribute equally among all
+            equal_weight = 1.0 / len(suggested)
+            suggested = {t: min(equal_weight, max_allocation) for t in suggested.keys()}
+            break
+    
+    # Final normalization
+    total_weight = sum(suggested.values())
+    suggested = {t: round(w/total_weight, 2) for t, w in suggested.items()}
+    
+    # Log diversification compliance
+    max_actual = max(suggested.values()) if suggested else 0
+    logger.info(f"Diversification check: Maximum allocation = {max_actual:.2%} (limit: {max_allocation:.2%})")
 
     return suggested
 
 def hybrid_predict_and_rebalance(recent_data, lstm_model_path, lstm_scaler_path, online_model_path, tickers, current_allocations, sequence_length=10):
-    lstm_model, scaler, feature_cols, target_col = load_lstm_model(lstm_model_path, lstm_scaler_path)
-    online_model = load_online_model(online_model_path, n_features=len(feature_cols))
-    hybrid_preds = {}
-    for ticker in tickers:
-        ticker_data = recent_data[recent_data['ticker'] == ticker]
-        if len(ticker_data) < sequence_length:
-            logger.info(f"Not enough data for {ticker} to make predictions. Skipping.")
-            continue
-        lstm_pred = predict_next(lstm_model, scaler, feature_cols, ticker_data, sequence_length)
-        online_pred = predict_online(online_model, feature_cols, ticker_data)
-        # Combine predictions using a simple average / can try weighted later
-        hybrid_pred = (lstm_pred + online_pred) / 2
-        hybrid_preds[ticker] = hybrid_pred
-    suggested = suggest_rebalance(hybrid_preds, current_allocations)
-    return suggested
+    try:
+        lstm_model, scaler, feature_cols, target_col = load_lstm_model(lstm_model_path, lstm_scaler_path)
+        online_model = load_online_model(online_model_path, n_features=len(feature_cols))
+        hybrid_preds = {}
+        
+        for ticker in tickers:
+            ticker_data = recent_data[recent_data['ticker'] == ticker]
+            if len(ticker_data) < sequence_length:
+                logger.info(f"Not enough data for {ticker} to make predictions. Skipping.")
+                continue
+            lstm_pred = predict_next(lstm_model, scaler, feature_cols, ticker_data, sequence_length)
+            online_pred = predict_online(online_model, feature_cols, ticker_data)
+            # Combine predictions using a simple average / can try weighted later
+            hybrid_pred = (lstm_pred + online_pred) / 2
+            hybrid_preds[ticker] = hybrid_pred
+            
+        suggested = suggest_rebalance(hybrid_preds, current_allocations)
+        return {
+            'status': 'success',
+            'predictions': hybrid_preds,
+            'suggested_allocations': suggested,
+            'message': f'Successfully generated predictions for {len(hybrid_preds)} tickers'
+        }
+    except Exception as e:
+        logger.error(f"Error in hybrid prediction: {str(e)}")
+        return {
+            'status': 'error',
+            'message': str(e),
+            'predictions': {},
+            'suggested_allocations': {}
+        }
 
-# testing
-recent_data = pd.read_csv("../../data/processed/stock_prices_latest.csv")
-tickers = recent_data['ticker'].unique()
-current_allocations = {'AAPL': 0.7, 'TSLA': 0.3}  # example
-suggested = hybrid_predict_and_rebalance(
-    recent_data,
-    '../../models/lstm_model.keras',
-    '../../models/lstm_model_scaler.pkl',
-    '../../models/ogdm_model.pkl',
-    tickers,
-    current_allocations,
-    sequence_length=5
-)
-print(suggested)
+def parse_allocations(allocation_str):
+    """Parse allocation string in format 'AAPL:0.7,TSLA:0.3'"""
+    try:
+        allocations = {}
+        pairs = allocation_str.split(',')
+        for pair in pairs:
+            ticker, weight = pair.split(':')
+            allocations[ticker.strip()] = float(weight.strip())
+        return allocations
+    except Exception as e:
+        raise ValueError(f"Invalid allocation format. Expected 'TICKER:WEIGHT,TICKER:WEIGHT'. Error: {e}")
+
+def main():
+    parser = argparse.ArgumentParser(description='Generate portfolio rebalancing suggestions using hybrid LSTM-Online model')
+    
+    parser.add_argument('--data-path', required=True, 
+                       help='Path to the recent stock data CSV file')
+    parser.add_argument('--lstm-model-path', required=True,
+                       help='Path to the trained LSTM model (.keras file)')
+    parser.add_argument('--lstm-scaler-path', required=True,
+                       help='Path to the LSTM model scaler (.pkl file)')
+    parser.add_argument('--online-model-path', required=True,
+                       help='Path to the online learning model (.pkl file)')
+    parser.add_argument('--tickers', required=True,
+                       help='Comma-separated list of tickers (e.g., AAPL,TSLA,GOOGL)')
+    parser.add_argument('--current-allocations', required=True,
+                       help='Current allocations in format TICKER:WEIGHT,TICKER:WEIGHT (e.g., AAPL:0.7,TSLA:0.3)')
+    parser.add_argument('--sequence-length', type=int, default=10,
+                       help='Sequence length for LSTM predictions (default: 10)')
+    parser.add_argument('--output', choices=['json', 'pretty'], default='json',
+                       help='Output format: json or pretty (default: json)')
+    
+    args = parser.parse_args()
+    
+    try:
+        # Load and validate data
+        if not os.path.exists(args.data_path):
+            raise FileNotFoundError(f"Data file not found: {args.data_path}")
+            
+        recent_data = pd.read_csv(args.data_path)
+        tickers = [t.strip() for t in args.tickers.split(',')]
+        current_allocations = parse_allocations(args.current_allocations)
+        
+        # Validate that all specified tickers exist in data
+        available_tickers = recent_data['ticker'].unique()
+        missing_tickers = set(tickers) - set(available_tickers)
+        if missing_tickers:
+            logger.warning(f"Tickers not found in data: {missing_tickers}")
+            tickers = [t for t in tickers if t in available_tickers]
+        
+        if not tickers:
+            raise ValueError("No valid tickers found in the data")
+            
+        # Validate allocation weights sum to 1
+        total_weight = sum(current_allocations.values())
+        if abs(total_weight - 1.0) > 0.01:
+            logger.warning(f"Current allocations sum to {total_weight}, normalizing to 1.0")
+            current_allocations = {k: v/total_weight for k, v in current_allocations.items()}
+        
+        # Generate predictions and suggestions
+        result = hybrid_predict_and_rebalance(
+            recent_data,
+            args.lstm_model_path,
+            args.lstm_scaler_path,
+            args.online_model_path,
+            tickers,
+            current_allocations,
+            args.sequence_length
+        )
+        
+        # Output results
+        if args.output == 'json':
+            print(json.dumps(result, indent=2))
+        else:
+            if result['status'] == 'success':
+                print("Portfolio Rebalancing Suggestions:")
+                print("=" * 40)
+                print(f"Status: {result['status']}")
+                print(f"Message: {result['message']}")
+                print("\nPredicted Returns:")
+                for ticker, pred in result['predictions'].items():
+                    print(f"  {ticker}: {pred:.4f}")
+                print("\nSuggested Allocations:")
+                for ticker, weight in result['suggested_allocations'].items():
+                    print(f"  {ticker}: {weight:.2%}")
+            else:
+                print(f"Error: {result['message']}")
+                sys.exit(1)
+                
+    except Exception as e:
+        error_result = {
+            'status': 'error',
+            'message': str(e),
+            'predictions': {},
+            'suggested_allocations': {}
+        }
+        if args.output == 'json':
+            print(json.dumps(error_result, indent=2))
+        else:
+            print(f"Error: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
