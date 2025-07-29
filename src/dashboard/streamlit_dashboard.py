@@ -56,15 +56,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown('<h1 class="main-header">📈 Market Movement Prediction Dashboard</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header"> Portfolio Optimization Dashboard</h1>', unsafe_allow_html=True)
 
 # Sidebar for model selection and parameters
-st.sidebar.header("🔧 Model Configuration")
+st.sidebar.header("Model Configuration")
 
 # Model selection
 model_type = st.sidebar.selectbox(
     "Select Model Type",
-    ["Random Forest", "XGBoost", "LSTM", "Prophet"]
+    ["Markowitz", "CAPM", "LSTM", "OGDM"]
 )
 
 # Data source selection
@@ -74,7 +74,7 @@ data_source = st.sidebar.selectbox(
 )
 
 # Main dashboard layout
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Prediction", "📈 Historical Analysis", "🔍 Model Performance", "⚙️ Settings"])
+tab1, tab2, tab3 = st.tabs(["Prediction", "Historical Analysis", "Model Performance"])
 
 with tab1:
     st.header("Market Movement Prediction")
@@ -103,7 +103,7 @@ with tab1:
         market_sentiment = st.selectbox("Market Sentiment", ["Bullish", "Neutral", "Bearish"])
         
         # Predict button
-        predict_button = st.button("🚀 Generate Prediction", type="primary")
+        predict_button = st.button("Generate Prediction", type="primary")
     
     with col2:
         st.subheader("Prediction Results")
@@ -234,42 +234,6 @@ with tab3:
                            orientation='h', title='Feature Importance')
     st.plotly_chart(fig_importance, use_container_width=True)
 
-with tab4:
-    st.header("Dashboard Settings")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Model Settings")
-        
-        # Model parameters
-        st.slider("Learning Rate", 0.001, 0.1, 0.01, format="%.3f")
-        st.slider("Max Depth", 3, 20, 6)
-        st.slider("Number of Estimators", 50, 500, 100)
-        
-        # Retrain model
-        if st.button("🔄 Retrain Model"):
-            with st.spinner("Retraining model..."):
-                progress_bar = st.progress(0)
-                for i in range(100):
-                    progress_bar.progress(i + 1)
-                st.success("Model retrained successfully!")
-    
-    with col2:
-        st.subheader("Data Settings")
-        
-        # Data refresh settings
-        auto_refresh = st.checkbox("Auto-refresh data")
-        refresh_interval = st.selectbox("Refresh Interval", ["1 min", "5 min", "15 min", "1 hour"])
-        
-        # Export options
-        st.subheader("Export Options")
-        if st.button("📥 Export Predictions"):
-            st.success("Predictions exported to CSV!")
-        
-        if st.button("📊 Export Charts"):
-            st.success("Charts exported to PDF!")
-
 # Footer
 st.markdown("---")
 st.markdown("""
@@ -279,6 +243,3 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Real-time updates (if auto-refresh is enabled)
-if 'auto_refresh' in locals() and auto_refresh:
-    st.rerun()
