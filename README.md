@@ -255,11 +255,6 @@ SUBREDDITS = [
 - **Gradual Rebalancing**: Maximum 20% change per period
 - **Volatility Filtering**: 1st-99th percentile return filtering
 
-## Notebooks
-
-- `02_sentiment_analysis.ipynb`: Sentiment analysis exploration
-- Additional notebooks for data exploration and model development
-
 ## Logging
 
 The system uses structured logging for monitoring:
@@ -274,10 +269,6 @@ The system uses structured logging for monitoring:
 2. Create a feature branch
 3. Make changes with appropriate tests
 4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
 
