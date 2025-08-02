@@ -2,9 +2,13 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 from sklearn.linear_model import LinearRegression
-import logging
+import pickle
+import argparse
+import os
+from utils.constants import TICKERS
+from src.utils.logger import setup_logger
 
-logger = logging.getLogger(__name__)
+logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
 class CAPMOptimizer:
     def __init__(self, tickers, market_ticker='^GSPC', start_date=None, end_date=None):
@@ -70,3 +74,65 @@ class CAPMOptimizer:
         weights = {ticker: score / total_score for ticker, score in risk_adjusted_returns.items()}
 
         return weights, expected_returns, self.betas
+
+    def save_model(self, filepath):
+        """Save the model to a pickle file"""
+        try:
+            with open(filepath, 'wb') as f:
+                pickle.dump(self, f)
+            logger.info(f"Model saved successfully to {filepath}")
+        except Exception as e:
+            logger.error(f"Error saving model: {e}")
+            raise
+
+    @classmethod
+    def load_model(cls, filepath):
+        """Load a model from a pickle file"""
+        try:
+            with open(filepath, 'rb') as f:
+                model = pickle.load(f)
+            logger.info(f"Model loaded successfully from {filepath}")
+            return model
+        except Exception as e:
+            logger.error(f"Error loading model: {e}")
+            raise
+
+def main():
+    """Main function to run CAPM optimization from command line"""
+    parser = argparse.ArgumentParser(description='Run CAPM Portfolio Optimization')
+    parser.add_argument('--model_save_path', required=True, help='Path to save the trained model')
+    parser.add_argument('--market_ticker', default='^GSPC', help='Market index ticker (default: S&P 500)')
+    parser.add_argument('--market_return', type=float, default=0.10, help='Expected market return (default: 0.10)')
+    parser.add_argument('--start_date', default='2022-01-01', help='Start date for data (YYYY-MM-DD)')
+    parser.add_argument('--end_date', default='2024-01-01', help='End date for data (YYYY-MM-DD)')
+    
+    args = parser.parse_args()
+    
+    # Ensure model directory exists
+    os.makedirs(os.path.dirname(args.model_save_path), exist_ok=True)
+    
+    # Parse tickers
+    tickers = TICKERS
+
+    # Initialize optimizer
+    optimizer = CAPMOptimizer(
+        tickers=tickers,
+        market_ticker=args.market_ticker,
+        start_date=args.start_date,
+        end_date=args.end_date
+    )
+    
+    # Optimize portfolio
+    weights, expected_returns, betas = optimizer.optimize_portfolio(market_return=args.market_return)
+    
+    # Log results
+    logger.info(f"Optimal weights: {weights}")
+    logger.info(f"Expected returns: {expected_returns}")
+    logger.info(f"Betas: {betas}")
+    
+    # Save model
+    optimizer.save_model(args.model_save_path)
+    print(f"CAPM model saved to {args.model_save_path}")
+
+if __name__ == "__main__":
+    main()

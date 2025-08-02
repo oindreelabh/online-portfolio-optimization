@@ -15,6 +15,7 @@ model_dir="models"
 lstm_model_name="lstm_model.keras"
 ogdm_model_name="ogdm_model.pkl"
 markowitz_model_name="markowitz_model.pkl"
+capm_model_name="capm_model.pkl"
 
 #echo "Step 1: Fetching data..."
 #python -m src.data.fetch_yfinance \
@@ -92,12 +93,21 @@ markowitz_model_name="markowitz_model.pkl"
 #    exit 1
 #fi
 
-echo "Step 6: Running Markowitz portfolio optimization..."
-python -m src.model.markowitz \
---data_path $processed_dir/$yFinance_historical \
---model_save_path $model_dir/$markowitz_model_name
+# echo "Step 6: Running Markowitz portfolio optimization..."
+# python -m src.model.markowitz \
+# --data_path $processed_dir/$yFinance_historical \
+# --model_save_path $model_dir/$markowitz_model_name
+# if [ $? -ne 0 ]; then
+#     echo "Error running Markowitz model. Exiting."
+#     exit 1
+# fi
+
+echo "Step 7: Running CAPM portfolio optimization..."
+python -m src.model.capm_model \
+--model_save_path $model_dir/$capm_model_name \
+--market_return 0.10
 if [ $? -ne 0 ]; then
-    echo "Error running Markowitz model. Exiting."
+    echo "Error running CAPM model. Exiting."
     exit 1
 fi
 
