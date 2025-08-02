@@ -26,3 +26,26 @@
 2025-08-02 18:03:29,345 - INFO - Padded features from 13 to 15
 2025-08-02 18:03:29,346 - INFO - Sorted tickers by predicted returns: ['AAPL', 'AMZN']
 2025-08-02 18:03:29,346 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-02 21:01:02,681 - INFO - Not enough data for AAPL to make predictions. Skipping.
+2025-08-02 21:01:02,681 - INFO - Not enough data for GOOGL to make predictions. Skipping.
+2025-08-02 21:01:02,681 - INFO - Not enough data for MSFT to make predictions. Skipping.
+2025-08-02 21:01:02,681 - INFO - Not enough data for TSLA to make predictions. Skipping.
+2025-08-02 21:01:02,681 - INFO - Sorted tickers by predicted returns: []
+2025-08-02 21:01:02,681 - INFO - Diversification check: Maximum allocation = 0.00% (limit: 25.00%)
+2025-08-02 21:01:46,439 - INFO - Not enough data for AAPL to make predictions. Skipping.
+2025-08-02 21:01:46,439 - INFO - Sorted tickers by predicted returns: []
+2025-08-02 21:01:46,439 - INFO - Diversification check: Maximum allocation = 0.00% (limit: 25.00%)
+2025-08-02 21:01:51,694 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-08-02 21:01:51,694 - INFO - Padded features from 13 to 15
+2025-08-02 21:01:51,695 - INFO - Sorted tickers by predicted returns: ['AAPL']
+2025-08-02 21:01:51,695 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-02 21:02:00,096 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-08-02 21:02:00,096 - INFO - Padded features from 13 to 15
+2025-08-02 21:02:00,096 - INFO - Sorted tickers by predicted returns: ['AAPL']
+2025-08-02 21:02:00,096 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-02 21:02:09,016 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-08-02 21:02:09,016 - INFO - Padded features from 13 to 15
+2025-08-02 21:02:09,036 - WARNING - Feature count mismatch: model expects 15 features but data has 13
+2025-08-02 21:02:09,037 - INFO - Padded features from 13 to 15
+2025-08-02 21:02:09,037 - INFO - Sorted tickers by predicted returns: ['AAPL', 'UNH']
+2025-08-02 21:02:09,037 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)

@@ -14,6 +14,7 @@ model_dir="models"
 
 lstm_model_name="lstm_model.keras"
 ogdm_model_name="ogdm_model.pkl"
+markowitz_model_name="markowitz_model.pkl"
 
 #echo "Step 1: Fetching data..."
 #python -m src.data.fetch_yfinance \
@@ -91,19 +92,30 @@ ogdm_model_name="ogdm_model.pkl"
 #    exit 1
 #fi
 
-# Evaluate LSTM model
-echo "Step 6: Evaluating LSTM model..."
-python -m src.evaluation.evaluate_lstm \
---data_path data/processed/stock_prices_latest.csv \
---model_path models/lstm_model.keras \
---scaler_path models/lstm_model_scaler.pkl \
---sequence_length 5 \
---output_dir evaluation_results/lstm
+echo "Step 6: Running Markowitz portfolio optimization..."
+python -m src.model.markowitz \
+--data_path $processed_dir/$yFinance_historical \
+--model_save_path $model_dir/$markowitz_model_name
+if [ $? -ne 0 ]; then
+    echo "Error running Markowitz model. Exiting."
+    exit 1
+fi
+
+# # Evaluate LSTM model
+# echo "Step 6: Evaluating LSTM model..."
+# python -m src.evaluation.evaluate_lstm \
+# --data_path data/processed/stock_prices_latest.csv \
+# --model_path models/lstm_model.keras \
+# --scaler_path models/lstm_model_scaler.pkl \
+# --sequence_length 5 \
+# --output_dir evaluation_results/lstm
 
 ## Evaluate Online Learning model
 #python src/evaluation/evaluate_online.py --data_path data/processed/test_data.csv --model_path models/ogdm_model.pkl --target_col close --output_dir evaluation_results/online
 #
 ## Evaluate Hybrid model with portfolio backtesting
 #python src/evaluation/evaluate_hybrid.py --data_path data/processed/test_data.csv --lstm_model_path models/lstm_model.keras --lstm_scaler_path models/lstm_model_scaler.pkl --online_model_path models/ogdm_model.pkl --sequence_length 5 --target_col close --output_dir evaluation_results/hybrid
+
+
 
 echo "Pipeline completed successfully."

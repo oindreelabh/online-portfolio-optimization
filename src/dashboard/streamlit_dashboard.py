@@ -9,19 +9,14 @@ import os
 import sys
 from datetime import datetime
 
-# Add parent directories to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-# Import hybrid model functions
-try:
-    from model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
-except ImportError:
-    try:
-        from src.model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
-    except ImportError:
-        # Add more path options
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        from src.model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
+# Import hybrid model functions and Markowitz optimizer
+from src.model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
+from src.model.markowitz import MarkowitzOptimizer
 
 # Page configuration
 st.set_page_config(
@@ -76,7 +71,7 @@ model_type = st.sidebar.selectbox(
     "Select Model Type",
     ["Markowitz", "CAPM", "LSTM-OGDM Hybrid"]
 )
-model_type = model_type.lower()
+model_type = model_type.strip().lower()
 model_path_dict = {
     "markowitz": "markowitz_model.pkl",
     "capm": "capm_model.pkl",
@@ -165,13 +160,13 @@ with tab1:
                 
                 if model_type == "lstm-ogdm hybrid":
                     # Load actual data from CSV file
-                    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "processed", "recent_data_with_sentiment.csv")
+                    data_path = os.path.join(project_root, "data", "processed", "recent_data_with_sentiment.csv")
                     
                     # Check if data file exists
                     if not os.path.exists(data_path):
                         st.error(f"Data file not found: {data_path}")
                         st.info("Please ensure the recent_data_with_sentiment.csv file exists in the data/processed directory.")
-                        raise FileNotFoundError(f"Required data file not found: {data_path}")
+                        st.stop()
                     
                     try:
                         # Load the actual data
@@ -184,17 +179,17 @@ with tab1:
                             available_tickers = pd.read_csv(data_path)['ticker'].unique().tolist()
                             st.error(f"No data found for selected tickers: {tickers}")
                             st.info(f"Available tickers in data: {', '.join(available_tickers)}")
-                            raise ValueError(f"No data available for selected tickers: {tickers}")
+                            st.stop()
                         
                         st.info(f"Loaded {len(sample_data)} records for {len(sample_data['ticker'].unique())} tickers from actual data")
                         
                     except Exception as e:
                         st.error(f"Error loading data file: {str(e)}")
-                        raise e
+                        st.stop()
                     
                     try:
                         # Model paths - LSTM model, scaler, and online model are required
-                        base_model_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "models")
+                        base_model_dir = os.path.join(project_root, "models")
                         lstm_model_path = os.path.join(base_model_dir, "lstm_model.keras")
                         lstm_scaler_path = os.path.join(base_model_dir, "lstm_model_scaler.pkl")
                         online_model_path = os.path.join(base_model_dir, "ogdm_model.pkl")
@@ -208,7 +203,7 @@ with tab1:
                         if missing_files:
                             st.error(f"Missing model files: {', '.join(missing_files)}")
                             st.info("Please ensure LSTM model, scaler, and OGDM model files are trained and saved in the models directory.")
-                            raise FileNotFoundError(f"Required model files not found: {', '.join(missing_files)}")
+                            st.stop()
                         
                         # Generate predictions using hybrid model
                         result = hybrid_predict_and_rebalance(
@@ -228,7 +223,8 @@ with tab1:
                             if not result['predictions'] or not result['suggested_allocations']:
                                 st.warning("No valid predictions or allocations generated. This may be due to insufficient data")
                                 st.info("Please try with different tickers or check if you have enough historical data.")
-                                return
+                                st.error("Exiting due to missing predictions or allocations. Please check your data and try again.")
+                                sys.exit(1)
                             
                             # Display predictions
                             st.subheader("Predicted Returns")
@@ -301,7 +297,7 @@ with tab1:
                         
                         # Show debug information without raising the exception
                         with st.expander("Debug Information"):
-                            st.write(f"Error details: {str(e)}")
+                            st.code(f"Error details: {str(e)}")
                             st.write(f"Selected tickers: {tickers}")
                             st.write(f"Data path: {data_path}")
                             st.write(f"Model paths:")
@@ -311,7 +307,7 @@ with tab1:
 
                 else:
                     # Original prediction logic for other models
-                    base_model_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "models")
+                    base_model_dir = os.path.join(project_root, "models")
                     model_filename = model_path_dict.get(model_type, "default_model.pkl")
                     model_path = os.path.join(base_model_dir, model_filename)
                     
@@ -321,69 +317,110 @@ with tab1:
                         raise FileNotFoundError(f"Required model file not found: {model_path}")
                     
                     try:
-                        model = joblib.load(model_path)
-                        
-                        # Prepare input features
-                        input_features = pd.DataFrame([{
-                            'RSI': rsi,
-                            'MACD': macd,
-                            'Bollinger_Band_Position': bb_position,
-                            'Volume_Ratio': volume_ratio,
-                            'VIX': vix,
-                            'Market_Sentiment': {"Positive": 1, "Neutral": 0, "Negative": -1}[market_sentiment]
-                        }])
-
-                        # Predict
-                        if hasattr(model, "predict_proba"):
-                            prob = model.predict_proba(input_features)[0]
-                            positive_prob = prob[1] if len(prob) > 1 else prob[0]
-                            movement_prediction = "Positive" if positive_prob > 0.5 else "Negative"
-                            confidence = positive_prob if movement_prediction == "Positive" else 1 - positive_prob
+                        if model_type == "markowitz":
+                            # Use Markowitz model for portfolio optimization
+                            model = MarkowitzOptimizer.load_model(model_path)
+                            
+                            # For Markowitz, we don't predict movement but show portfolio optimization
+                            if model.mean_returns is not None and model.cov_matrix is not None:
+                                # Get optimal weights
+                                optimal_weights = model.optimize()
+                                
+                                # Calculate portfolio statistics
+                                portfolio_return, portfolio_vol, sharpe_ratio = model.portfolio_stats(optimal_weights)
+                                
+                                # Display optimization results
+                                st.success("Portfolio Optimization Complete")
+                                
+                                # Show optimal allocation
+                                allocation_df = pd.DataFrame([
+                                    {'Asset': ticker, 'Weight': f"{weight:.2%}"}
+                                    for ticker, weight in zip(model.tickers, optimal_weights)
+                                ])
+                                st.subheader("Optimal Portfolio Allocation")
+                                st.dataframe(allocation_df, use_container_width=True)
+                                
+                                # Portfolio metrics
+                                col_a, col_b, col_c = st.columns(3)
+                                col_a.metric("Expected Annual Return", f"{portfolio_return:.2%}")
+                                col_b.metric("Annual Volatility", f"{portfolio_vol:.2%}")
+                                col_c.metric("Sharpe Ratio", f"{sharpe_ratio:.3f}")
+                                
+                                # Pie chart of allocation
+                                fig_pie = px.pie(
+                                    values=optimal_weights,
+                                    names=model.tickers,
+                                    title="Optimal Portfolio Allocation"
+                                )
+                                st.plotly_chart(fig_pie, use_container_width=True)
+                            else:
+                                st.error("Model data not available. Please retrain the model.")
+                                
                         else:
-                            pred = model.predict(input_features)[0]
-                            movement_prediction = "Positive" if pred == 1 else "Negative"
-                            confidence = 1.0
-                        
-                        # Display prediction
-                        prediction_class = "positive" if movement_prediction == "Positive" else "negative"
-                        st.markdown(f"""
-                        <div class="prediction-box {prediction_class}">
-                            Prediction: {movement_prediction}<br>
-                            Confidence: {confidence:.1%}
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        # Metrics (using actual model predictions, not random)
-                        expected_return = confidence * 5 if movement_prediction == "Positive" else -confidence * 5
-                        risk_score = (1 - confidence) * 10
-                        volatility = (1 - confidence) * 40
-                        
-                        col_a, col_b, col_c = st.columns(3)
-                        col_a.metric("Expected Return", f"{expected_return:.2f}%")
-                        col_b.metric("Risk Score", f"{risk_score:.1f}/10")
-                        col_c.metric("Volatility", f"{volatility:.1f}%")
-                        
-                        # Prediction chart
-                        dates = pd.date_range(start=datetime.now(), periods=prediction_days, freq='D')
-                        prices = 100 + np.cumsum(np.random.randn(prediction_days) * 2)
-                        
-                        fig = go.Figure()
-                        fig.add_trace(go.Scatter(
-                            x=dates,
-                            y=prices,
-                            mode='lines+markers',
-                            name='Predicted Price',
-                            line=dict(color='blue', width=3)
-                        ))
-                        
-                        fig.update_layout(
-                            title=f"{symbol} Price Prediction",
-                            xaxis_title="Date",
-                            yaxis_title="Price ($)",
-                            hovermode='x unified'
-                        )
-                        
-                        st.plotly_chart(fig, use_container_width=True)
+                            # Use joblib for other models
+                            model = joblib.load(model_path)
+                            
+                            # Prepare input features
+                            input_features = pd.DataFrame([{
+                                'RSI': rsi,
+                                'MACD': macd,
+                                'Bollinger_Band_Position': bb_position,
+                                'Volume_Ratio': volume_ratio,
+                                'VIX': vix,
+                                'Market_Sentiment': {"Positive": 1, "Neutral": 0, "Negative": -1}[market_sentiment]
+                            }])
+
+                            # Predict
+                            if hasattr(model, "predict_proba"):
+                                prob = model.predict_proba(input_features)[0]
+                                positive_prob = prob[1] if len(prob) > 1 else prob[0]
+                                movement_prediction = "Positive" if positive_prob > 0.5 else "Negative"
+                                confidence = positive_prob if movement_prediction == "Positive" else 1 - positive_prob
+                            else:
+                                pred = model.predict(input_features)[0]
+                                movement_prediction = "Positive" if pred == 1 else "Negative"
+                                confidence = 1.0
+                            
+                            # Display prediction
+                            prediction_class = "positive" if movement_prediction == "Positive" else "negative"
+                            st.markdown(f"""
+                            <div class="prediction-box {prediction_class}">
+                                Prediction: {movement_prediction}<br>
+                                Confidence: {confidence:.1%}
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Metrics (using actual model predictions, not random)
+                            expected_return = confidence * 5 if movement_prediction == "Positive" else -confidence * 5
+                            risk_score = (1 - confidence) * 10
+                            volatility = (1 - confidence) * 40
+                            
+                            col_a, col_b, col_c = st.columns(3)
+                            col_a.metric("Expected Return", f"{expected_return:.2f}%")
+                            col_b.metric("Risk Score", f"{risk_score:.1f}/10")
+                            col_c.metric("Volatility", f"{volatility:.1f}%")
+                            
+                            # Prediction chart
+                            dates = pd.date_range(start=datetime.now(), periods=prediction_days, freq='D')
+                            prices = 100 + np.cumsum(np.random.randn(prediction_days) * 2)
+                            
+                            fig = go.Figure()
+                            fig.add_trace(go.Scatter(
+                                x=dates,
+                                y=prices,
+                                mode='lines+markers',
+                                name='Predicted Price',
+                                line=dict(color='blue', width=3)
+                            ))
+                            
+                            fig.update_layout(
+                                title=f"{symbol} Price Prediction",
+                                xaxis_title="Date",
+                                yaxis_title="Price ($)",
+                                hovermode='x unified'
+                            )
+                            
+                            st.plotly_chart(fig, use_container_width=True)
 
                     except Exception as e:
                         st.error(f"Error loading or running model: {str(e)}")
@@ -471,6 +508,12 @@ with tab3:
     st.plotly_chart(fig_importance, use_container_width=True)
 
 # Footer
+st.markdown("---")
+st.markdown("""
+<div style='text-align: center; color: #666;'>
+    <p>Market Movement Prediction Dashboard | Built with Streamlit</p>
+</div>
+""", unsafe_allow_html=True)
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
