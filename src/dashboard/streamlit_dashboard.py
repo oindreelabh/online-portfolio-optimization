@@ -66,6 +66,7 @@ model_type = st.sidebar.selectbox(
     "Select Model Type",
     ["Markowitz", "CAPM", "LSTM", "OGDM"]
 )
+model_type = model_type.lower()
 
 # Main dashboard layout
 tab1, tab2, tab3 = st.tabs(["Prediction", "Historical Analysis", "Model Performance"])
@@ -254,7 +255,6 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
     <p>Market Movement Prediction Dashboard | Built with Streamlit</p>
-    <p>⚠️ Disclaimer: This is for educational purposes only. Not financial advice.</p>
 </div>
 """, unsafe_allow_html=True)
 

@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
-from sklearn.metrics import mean_squared_error
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,22 +20,8 @@ class MarkowitzOptimizer:
         if self.csv_file_path:
             # Read data from CSV file
             data = pd.read_csv(self.csv_file_path, index_col=0, parse_dates=True)
-            
-            # Filter by tickers if specified
-            if self.tickers:
-                available_tickers = [ticker for ticker in self.tickers if ticker in data.columns]
-                if not available_tickers:
-                    raise ValueError(f"None of the specified tickers {self.tickers} found in CSV file")
-                data = data[available_tickers]
-                logger.info(f"Using tickers: {available_tickers}")
-            
-            # Filter by date range if specified
-            if self.start_date and self.end_date:
-                data = data.loc[self.start_date:self.end_date]
-            
         else:
             raise ValueError("CSV file path must be provided")
-        
         self.returns = data.pct_change().dropna()
         self.mean_returns = self.returns.mean()
         self.cov_matrix = self.returns.cov()
