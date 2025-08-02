@@ -72,7 +72,7 @@ ogdm_model_name="ogdm_model.pkl"
 #fi
 
 #echo "Step 5: Running LSTM model on 2 years of yfinance data..."
-#python -m src.model.lstm_hybrid \
+#python -m src.model.lstm \
 #--data_path $processed_dir/$yFinance_historical \
 #--model_save_path $model_dir/$lstm_model_name
 #
