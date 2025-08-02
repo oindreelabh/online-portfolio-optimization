@@ -42,12 +42,12 @@ st.markdown("""
         font-weight: bold;
         font-size: 1.2rem;
     }
-    .bullish {
+    .positive {
         background-color: #d4edda;
         color: #155724;
         border: 1px solid #c3e6cb;
     }
-    .bearish {
+    .negative {
         background-color: #f8d7da;
         color: #721c24;
         border: 1px solid #f5c6cb;
@@ -65,12 +65,6 @@ st.sidebar.header("Model Configuration")
 model_type = st.sidebar.selectbox(
     "Select Model Type",
     ["Markowitz", "CAPM", "LSTM", "OGDM"]
-)
-
-# Data source selection
-data_source = st.sidebar.selectbox(
-    "Select Data Source",
-    ["Upload CSV", "Yahoo Finance API", "Alpha Vantage API"]
 )
 
 # Main dashboard layout
@@ -100,7 +94,7 @@ with tab1:
         # Market sentiment
         st.subheader("Market Sentiment")
         vix = st.slider("VIX (Volatility Index)", 10.0, 80.0, 20.0)
-        market_sentiment = st.selectbox("Market Sentiment", ["Bullish", "Neutral", "Bearish"])
+        market_sentiment = st.selectbox("Market Sentiment", ["Positive", "Neutral", "Negative"])
         
         # Predict button
         predict_button = st.button("Generate Prediction", type="primary")
@@ -112,12 +106,33 @@ with tab1:
             # Simulate model prediction (replace with actual model inference)
             with st.spinner("Generating predictions..."):
                 # Mock prediction logic
-                prediction_prob = np.random.random()
-                movement_prediction = "Bullish" if prediction_prob > 0.5 else "Bearish"
-                confidence = abs(prediction_prob - 0.5) * 2
+                # Load your trained model (ensure the path and model type are correct)
+                model_path = os.path.join(os.path.dirname(__file__), "your_model.pkl")
+                model = joblib.load(model_path)
+
+                # Prepare input features as a DataFrame or array as expected by your model
+                input_features = pd.DataFrame([{
+                    'RSI': rsi,
+                    'MACD': macd,
+                    'Bollinger_Band_Position': bb_position,
+                    'Volume_Ratio': volume_ratio,
+                    'VIX': vix,
+                    'Market_Sentiment': {"Positive": 1, "Neutral": 0, "Negative": -1}[market_sentiment]
+                }])
+
+                # Predict probability and class
+                if hasattr(model, "predict_proba"):
+                    prob = model.predict_proba(input_features)[0]
+                    positive_prob = prob[1] if len(prob) > 1 else prob[0]
+                    movement_prediction = "Positive" if positive_prob > 0.5 else "Negative"
+                    confidence = positive_prob if movement_prediction == "Positive" else 1 - positive_prob
+                else:
+                    pred = model.predict(input_features)[0]
+                    movement_prediction = "Positive" if pred == 1 else "Negative"
+                    confidence = 1.0  # or set to None if not available
                 
                 # Display prediction
-                prediction_class = "bullish" if movement_prediction == "Bullish" else "bearish"
+                prediction_class = "positive" if movement_prediction == "Positive" else "negative"
                 st.markdown(f"""
                 <div class="prediction-box {prediction_class}">
                     Prediction: {movement_prediction}<br>
