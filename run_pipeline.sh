@@ -104,6 +104,7 @@ capm_model_name="capm_model.pkl"
 
 echo "Step 7: Running CAPM portfolio optimization..."
 python -m src.model.capm_model \
+--data_path $processed_dir/$yFinance_historical \
 --model_save_path $model_dir/$capm_model_name \
 --market_return 0.10
 if [ $? -ne 0 ]; then

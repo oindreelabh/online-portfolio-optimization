@@ -5,28 +5,46 @@ from sklearn.linear_model import LinearRegression
 import pickle
 import argparse
 import os
-from utils.constants import TICKERS
+from src.utils.constants import TICKERS
 from src.utils.logger import setup_logger
 
 logger = setup_logger(os.path.basename(__file__).replace(".py", ""))
 
 class CAPMOptimizer:
-    def __init__(self, tickers, market_ticker='^GSPC', start_date=None, end_date=None):
+    def __init__(self, tickers, market_ticker='^GSPC', start_date=None, end_date=None, csv_file_path=None):
         self.tickers = tickers
         self.market_ticker = market_ticker
         self.start_date = start_date
         self.end_date = end_date
+        self.csv_file_path = csv_file_path
         self.betas = {}
         self.alphas = {}
         self.risk_free_rate = 0.02  # 2% annual risk-free rate
 
     def fetch_data(self):
-        """Fetch stock and market data"""
-        # Fetch stock data
-        stock_data = yf.download(self.tickers, start=self.start_date, end=self.end_date)['Adj Close']
-        stock_returns = stock_data.pct_change().dropna()
+        """Fetch stock and market data from CSV file"""
+        if self.csv_file_path:
+            # Read data from CSV file
+            data = pd.read_csv(self.csv_file_path, index_col=0, parse_dates=True)
+            
+            # Filter only numeric columns for tickers
+            numeric_columns = data.select_dtypes(include=[np.number]).columns
+            stock_data = data[numeric_columns]
+            
+            # Filter for specified tickers if they exist in data
+            available_tickers = [ticker for ticker in self.tickers if ticker in stock_data.columns]
+            if not available_tickers:
+                raise ValueError(f"None of the specified tickers {self.tickers} found in data")
+            
+            self.tickers = available_tickers
+            stock_data = stock_data[self.tickers]
+            stock_returns = stock_data.pct_change().dropna()
+        else:
+            # Fallback to downloading data
+            stock_data = yf.download(self.tickers, start=self.start_date, end=self.end_date)['Adj Close']
+            stock_returns = stock_data.pct_change().dropna()
 
-        # Fetch market data
+        # Fetch market data (still download as it's just one ticker)
         market_data = yf.download(self.market_ticker, start=self.start_date, end=self.end_date)['Adj Close']
         market_returns = market_data.pct_change().dropna()
 
@@ -100,6 +118,7 @@ class CAPMOptimizer:
 def main():
     """Main function to run CAPM optimization from command line"""
     parser = argparse.ArgumentParser(description='Run CAPM Portfolio Optimization')
+    parser.add_argument('--data_path', help='Path to CSV file with stock price data')
     parser.add_argument('--model_save_path', required=True, help='Path to save the trained model')
     parser.add_argument('--market_ticker', default='^GSPC', help='Market index ticker (default: S&P 500)')
     parser.add_argument('--market_return', type=float, default=0.10, help='Expected market return (default: 0.10)')
@@ -119,7 +138,8 @@ def main():
         tickers=tickers,
         market_ticker=args.market_ticker,
         start_date=args.start_date,
-        end_date=args.end_date
+        end_date=args.end_date,
+        csv_file_path=args.data_path
     )
     
     # Optimize portfolio

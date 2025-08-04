@@ -12,3 +12,6 @@
 2025-08-02 22:14:23,483 - INFO - Sharpe ratio: 2.3862
 2025-08-02 22:14:23,484 - INFO - Model saved successfully to models/markowitz_model.pkl
 2025-08-02 23:39:09,940 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/markowitz_model.pkl
+2025-08-03 00:20:37,885 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/markowitz_model.pkl
+2025-08-03 00:20:43,215 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/markowitz_model.pkl
+2025-08-03 00:20:49,929 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/markowitz_model.pkl

@@ -69,17 +69,12 @@ st.sidebar.header("Model Configuration")
 # Model selection
 model_type = st.sidebar.selectbox(
     "Select Model Type",
-    ["Markowitz", "CAPM", "LSTM-OGDM Hybrid"]
+    ["LSTM-OGDM Hybrid", "Markowitz", "CAPM"]
 )
 model_type = model_type.strip().lower()
 model_path_dict = {
     "markowitz": "markowitz_model.pkl",
-    "capm": "capm_model.pkl",
-    "lstm-ogdm hybrid": {
-        "lstm_model": "lstm_model.keras",
-        "lstm_scaler": "lstm_scaler.pkl", 
-        "online_model": "online_model.pkl"
-    }
+    "capm": "capm_model.pkl"
 }
 
 # Main dashboard layout
