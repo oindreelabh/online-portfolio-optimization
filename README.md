@@ -9,7 +9,7 @@ This project implements a sophisticated portfolio optimization system that combi
 - **Hybrid Model Architecture**: Combines LSTM and Online Gradient Descent Momentum (OGDM) models
 - **Alternative Data Integration**: Incorporates Reddit sentiment and financial news sentiment
 - **Technical Indicators**: RSI, MACD, Bollinger Bands, and volume-based features
-- **Sentiment Analysis**: FinBERT-based sentiment scoring for social media and news
+- **Sentiment Analysis**: FinBERT, FinVADER-based sentiment scoring for social media and news
 - **Real-time Predictions**: Online learning for adapting to market changes
 - **Portfolio Optimization**: CAPM and Markowitz model implementations
 - **Interactive Dashboard**: Streamlit-based visualization and monitoring
