@@ -1,7 +1,0 @@
-2025-08-07 21:05:57,535 - INFO - Data loaded successfully. Shape: (15568, 14)
-2025-08-07 21:05:57,535 - INFO - Found 14 numeric columns: ['open', 'high', 'low', 'close', 'volume', 'returns', 'rsi', 'macd', 'macd_signal', 'sma_20', 'ema_20', 'bb_bbm', 'bb_bbh', 'bb_bbl']
-2025-08-07 21:05:57,578 - INFO - Optimal weights: {'open': np.float64(2.0180036874405697e-10), 'high': np.float64(7.479548271660345e-11), 'low': np.float64(0.0), 'close': np.float64(0.0), 'volume': np.float64(0.001903455694837512), 'returns': np.float64(0.0), 'rsi': np.float64(0.6926068464482819), 'macd': np.float64(0.0), 'macd_signal': np.float64(0.0), 'sma_20': np.float64(0.14787439037495095), 'ema_20': np.float64(0.0), 'bb_bbm': np.float64(0.14787437896927116), 'bb_bbh': np.float64(0.0), 'bb_bbl': np.float64(0.009740929999683505)}
-2025-08-07 21:05:57,578 - INFO - Expected annual return: 1.0400
-2025-08-07 21:05:57,578 - INFO - Annual volatility: 1.2378
-2025-08-07 21:05:57,578 - INFO - Sharpe ratio: 0.8402
-2025-08-07 21:05:57,580 - INFO - Model saved successfully to models/markowitz_model.pkl

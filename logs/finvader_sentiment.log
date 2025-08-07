@@ -1,4 +1,0 @@
-2025-08-07 21:05:36,347 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
-2025-08-07 21:05:37,113 - INFO - FinVADER sentiment annotation completed.
-2025-08-07 21:05:39,745 - INFO - Applying FinVADER sentiment to column 'cleaned_text'
-2025-08-07 21:05:39,756 - INFO - FinVADER sentiment annotation completed.
