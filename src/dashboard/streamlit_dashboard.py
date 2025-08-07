@@ -153,6 +153,14 @@ with tab1:
         if predict_button:
             with st.spinner("Generating predictions..."):
                 
+                # Validate model type
+                valid_models = ["lstm-ogdm hybrid", "markowitz", "capm"]
+                if model_type not in valid_models:
+                    st.error(f"Invalid model type: '{model_type}'")
+                    st.info(f"Please select one of the supported models: {', '.join(valid_models)}")
+                    st.warning("The selected model type is not supported by this dashboard.")
+                    st.stop()
+                
                 if model_type == "lstm-ogdm hybrid":
                     # Load actual data from CSV file
                     data_path = os.path.join(project_root, "data", "processed", "recent_data_with_sentiment.csv")
@@ -350,7 +358,54 @@ with tab1:
                                 st.plotly_chart(fig_pie, use_container_width=True)
                             else:
                                 st.error("Model data not available. Please retrain the model.")
-                                
+                        
+                        elif model_type == "capm":
+                            # Add CAPM model handling
+                            from src.model.capm_model import CAPMOptimizer
+                            
+                            model = CAPMOptimizer.load_model(model_path)
+                            
+                            # Get data path for CAPM
+                            data_path = os.path.join(project_root, "data", "processed", "recent_data_with_sentiment.csv")
+                            
+                            if not os.path.exists(data_path):
+                                st.error(f"Data file not found: {data_path}")
+                                st.stop()
+                            
+                            # Set CSV file path for the loaded model
+                            model.csv_file_path = data_path
+                            
+                            # Run CAPM optimization
+                            weights, expected_returns, betas = model.optimize_portfolio(market_return=0.10)
+                            
+                            # Display CAPM results
+                            st.success("CAPM Portfolio Optimization Complete")
+                            
+                            # Show optimal allocation
+                            allocation_df = pd.DataFrame([
+                                {'Asset': ticker, 'Weight': f"{weight:.2%}", 'Beta': f"{betas[ticker]:.3f}", 'Expected Return': f"{expected_returns[ticker]:.2%}"}
+                                for ticker, weight in weights.items()
+                            ])
+                            st.subheader("CAPM Optimal Portfolio")
+                            st.dataframe(allocation_df, use_container_width=True)
+                            
+                            # Portfolio metrics
+                            portfolio_return = sum(weight * expected_returns[ticker] for ticker, weight in weights.items())
+                            avg_beta = sum(weight * betas[ticker] for ticker, weight in weights.items())
+                            
+                            col_a, col_b, col_c = st.columns(3)
+                            col_a.metric("Portfolio Expected Return", f"{portfolio_return:.2%}")
+                            col_b.metric("Portfolio Beta", f"{avg_beta:.3f}")
+                            col_c.metric("Risk-Free Rate", f"{model.risk_free_rate:.2%}")
+                            
+                            # Pie chart of allocation
+                            fig_pie = px.pie(
+                                values=list(weights.values()),
+                                names=list(weights.keys()),
+                                title="CAPM Optimal Portfolio Allocation"
+                            )
+                            st.plotly_chart(fig_pie, use_container_width=True)
+                            
                         else:
                             # Use joblib for other models
                             model = joblib.load(model_path)

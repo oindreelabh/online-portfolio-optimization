@@ -1,3 +1,11 @@
 2025-08-07 20:55:22,799 - INFO - Starting Reddit data fetching and storing...
 2025-08-07 20:55:24,559 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
 2025-08-07 20:55:24,559 - INFO - Fetching posts from r/stocks
+2025-08-07 20:59:10,678 - INFO - Fetching posts from r/wallstreetbets
+2025-08-07 21:01:19,766 - INFO - Fetching posts from r/investing
+2025-08-07 21:02:40,162 - INFO - Fetching posts from r/stockmarket
+2025-08-07 21:03:28,004 - INFO - Fetching posts from r/pennystocks
+2025-08-07 21:04:29,314 - INFO - Fetched 636 Reddit posts.
+2025-08-07 21:04:29,381 - INFO - Preprocessed Reddit posts.
+2025-08-07 21:04:29,404 - INFO - Latest data written successfully to data/raw/reddit_posts.csv.
+2025-08-07 21:04:29,404 - INFO - Reddit data fetching and storing completed.
