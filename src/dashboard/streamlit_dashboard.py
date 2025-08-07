@@ -4,11 +4,9 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import joblib
 import os
 import sys
 from datetime import datetime
-from src.model.capm_model import CAPMOptimizer
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,6 +16,7 @@ if project_root not in sys.path:
 # Import hybrid model functions and Markowitz optimizer
 from src.model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
 from src.model.markowitz import MarkowitzOptimizer
+from src.model.capm_model import CAPMOptimizer
 
 # Page configuration
 st.set_page_config(
