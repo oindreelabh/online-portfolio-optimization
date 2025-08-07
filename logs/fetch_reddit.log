@@ -1,0 +1,3 @@
+2025-08-07 20:55:22,799 - INFO - Starting Reddit data fetching and storing...
+2025-08-07 20:55:24,559 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
+2025-08-07 20:55:24,559 - INFO - Fetching posts from r/stocks

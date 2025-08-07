@@ -1,0 +1,2 @@
+2025-08-07 20:55:22,800 - INFO - Requesting metadata for 12 tickers from OpenFIGI
+2025-08-07 20:55:24,559 - INFO - Saved fallback OpenFIGI mapping to data/raw/ticker_keyword_map.csv

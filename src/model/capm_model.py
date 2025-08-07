@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import yfinance as yf
 from sklearn.linear_model import LinearRegression
 import pickle
 import argparse
@@ -25,28 +24,29 @@ class CAPMOptimizer:
         """Fetch stock and market data from CSV file"""
         if self.csv_file_path:
             # Read data from CSV file
-            data = pd.read_csv(self.csv_file_path, index_col=0, parse_dates=True)
+            data = pd.read_csv(self.csv_file_path, parse_dates=['date'])
             
-            # Filter only numeric columns for tickers
-            numeric_columns = data.select_dtypes(include=[np.number]).columns
-            stock_data = data[numeric_columns]
+            # Check if market ticker exists in data
+            if self.market_ticker not in data['ticker'].values:
+                raise ValueError(f"Market ticker {self.market_ticker} not found in data")
             
             # Filter for specified tickers if they exist in data
-            available_tickers = [ticker for ticker in self.tickers if ticker in stock_data.columns]
+            available_tickers = [ticker for ticker in self.tickers if ticker in data['ticker'].values]
             if not available_tickers:
                 raise ValueError(f"None of the specified tickers {self.tickers} found in data")
             
             self.tickers = available_tickers
-            stock_data = stock_data[self.tickers]
-            stock_returns = stock_data.pct_change().dropna()
+            
+            # Pivot data to get returns for each ticker
+            stock_data = data[data['ticker'].isin(self.tickers)].pivot(index='date', columns='ticker', values='returns')
+            stock_returns = stock_data.dropna()
+            
+            # Get market returns
+            market_data = data[data['ticker'] == self.market_ticker].set_index('date')['returns']
+            market_returns = market_data.dropna()
         else:
-            # Fallback to downloading data
-            stock_data = yf.download(self.tickers, start=self.start_date, end=self.end_date)['Adj Close']
-            stock_returns = stock_data.pct_change().dropna()
-
-        # Fetch market data (still download as it's just one ticker)
-        market_data = yf.download(self.market_ticker, start=self.start_date, end=self.end_date)['Adj Close']
-        market_returns = market_data.pct_change().dropna()
+            # Throw error instead of downloading data
+            raise ValueError("CSV file path is required. Downloading from yfinance is not supported.")
 
         return stock_returns, market_returns
 

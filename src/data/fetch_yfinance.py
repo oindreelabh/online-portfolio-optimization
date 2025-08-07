@@ -37,19 +37,25 @@ def fetch_yfinance_data(tickers: list[str], period="1mo", interval="1d") -> pd.D
         logger.error(f"Error fetching yfinance data: {e}")
         raise
 
-def fetch_and_store_historical_data(filename, raw_dir):
+def fetch_and_store_historical_data(filename, raw_dir, market_ticker='^GSPC'):
     try:
-        logger.info("Fetching historical data for last 2 years...")
-        df = fetch_yfinance_data(TICKERS, period="5y", interval="1d")
+        logger.info("Fetching historical data for last 5 years...")
+        # Combine stock tickers with market ticker
+        all_tickers = TICKERS + [market_ticker]
+        logger.info(f"Including market ticker: {market_ticker}")
+        df = fetch_yfinance_data(all_tickers, period="5y", interval="1d")
         csv_path = write_df_to_csv(df, raw_dir, filename)
         logger.info(f"Historical data written successfully to {csv_path}.")
     except Exception as e:
         logger.error(f"Failed to fetch/store historical data: {e}")
 
-def fetch_and_store_latest_data(filename, raw_dir):
+def fetch_and_store_latest_data(filename, raw_dir, market_ticker='^GSPC'):
     try:
         logger.info("Fetching latest data for last 2 weeks...")
-        df = fetch_yfinance_data(TICKERS, period="14d", interval="1d")
+        # Combine stock tickers with market ticker
+        all_tickers = TICKERS + [market_ticker]
+        logger.info(f"Including market ticker: {market_ticker}")
+        df = fetch_yfinance_data(all_tickers, period="14d", interval="1d")
         csv_path = write_df_to_csv(df, raw_dir, filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     except Exception as e:
@@ -58,11 +64,13 @@ def fetch_and_store_latest_data(filename, raw_dir):
 if __name__ == "__main__":
     logger.info("Starting YFinance data fetching and storing...")
     parser = argparse.ArgumentParser(description="Fetch and store YFinance data.")
-    parser.add_argument('--historical', type=str, help="Fetch historical data for last 2 years")
+    parser.add_argument('--historical', type=str, help="Fetch historical data for last 5 years")
     parser.add_argument('--latest', type=str, help="Fetch latest data for last 2 weeks")
-    parser.add_argument('--raw_dir', type=str, default="../../data/raw", help="Directory for raw data files")
+    parser.add_argument('--raw_dir', type=str, help="Directory for raw data files")
+    parser.add_argument('--market_ticker', type=str, default='^GSPC', help="Market index ticker (default: S&P 500)")
     args = parser.parse_args()
-    fetch_and_store_historical_data(args.historical, args.raw_dir)
-    fetch_and_store_latest_data(args.latest, args.raw_dir)
+    
+    fetch_and_store_historical_data(args.historical, args.raw_dir, args.market_ticker)
+    fetch_and_store_latest_data(args.latest, args.raw_dir, args.market_ticker)
     logger.info("YFinance data fetching and storing completed.")
 
