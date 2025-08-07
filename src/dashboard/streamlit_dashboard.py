@@ -20,9 +20,10 @@ from src.model.capm_model import CAPMOptimizer
 
 # Page configuration
 st.set_page_config(
-    page_title="Portfolio Optimization Dashboard",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Portfolio Optimization Dashboard",  # Title shown in browser tab
+    page_icon=":chart_with_upwards_trend:",        # Emoji or path to favicon
+    layout="wide",                                 # "centered" or "wide"
+    initial_sidebar_state="collapsed"               # "auto", "expanded", or "collapsed"
 )
 
 # Custom CSS
