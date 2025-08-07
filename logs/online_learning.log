@@ -6,3 +6,4 @@
 2025-08-07 21:05:57,096 - INFO - Performed partial_fit step with momentum.
 2025-08-07 21:05:57,097 - INFO - Model saved to models/ogdm_model.pkl.
 2025-08-07 21:05:57,097 - INFO - OGDM training step completed and model saved.
+2025-08-07 21:31:02,295 - INFO - Model loaded from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/ogdm_model.pkl.

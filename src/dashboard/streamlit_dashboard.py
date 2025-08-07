@@ -8,6 +8,7 @@ import joblib
 import os
 import sys
 from datetime import datetime
+from src.model.capm_model import CAPMOptimizer
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -152,14 +153,6 @@ with tab1:
         
         if predict_button:
             with st.spinner("Generating predictions..."):
-                
-                # Validate model type
-                valid_models = ["lstm-ogdm hybrid", "markowitz", "capm"]
-                if model_type not in valid_models:
-                    st.error(f"Invalid model type: '{model_type}'")
-                    st.info(f"Please select one of the supported models: {', '.join(valid_models)}")
-                    st.warning("The selected model type is not supported by this dashboard.")
-                    st.stop()
                 
                 if model_type == "lstm-ogdm hybrid":
                     # Load actual data from CSV file
@@ -361,12 +354,11 @@ with tab1:
                         
                         elif model_type == "capm":
                             # Add CAPM model handling
-                            from src.model.capm_model import CAPMOptimizer
                             
                             model = CAPMOptimizer.load_model(model_path)
                             
                             # Get data path for CAPM
-                            data_path = os.path.join(project_root, "data", "processed", "recent_data_with_sentiment.csv")
+                            data_path = os.path.join(project_root, "data", "processed", "stock_prices_historical.csv")
                             
                             if not os.path.exists(data_path):
                                 st.error(f"Data file not found: {data_path}")
@@ -405,76 +397,13 @@ with tab1:
                                 title="CAPM Optimal Portfolio Allocation"
                             )
                             st.plotly_chart(fig_pie, use_container_width=True)
-                            
                         else:
-                            # Use joblib for other models
-                            model = joblib.load(model_path)
-                            
-                            # Prepare input features
-                            input_features = pd.DataFrame([{
-                                'RSI': rsi,
-                                'MACD': macd,
-                                'Bollinger_Band_Position': bb_position,
-                                'Volume_Ratio': volume_ratio,
-                                'VIX': vix,
-                                'Market_Sentiment': {"Positive": 1, "Neutral": 0, "Negative": -1}[market_sentiment]
-                            }])
-
-                            # Predict
-                            if hasattr(model, "predict_proba"):
-                                prob = model.predict_proba(input_features)[0]
-                                positive_prob = prob[1] if len(prob) > 1 else prob[0]
-                                movement_prediction = "Positive" if positive_prob > 0.5 else "Negative"
-                                confidence = positive_prob if movement_prediction == "Positive" else 1 - positive_prob
-                            else:
-                                pred = model.predict(input_features)[0]
-                                movement_prediction = "Positive" if pred == 1 else "Negative"
-                                confidence = 1.0
-                            
-                            # Display prediction
-                            prediction_class = "positive" if movement_prediction == "Positive" else "negative"
-                            st.markdown(f"""
-                            <div class="prediction-box {prediction_class}">
-                                Prediction: {movement_prediction}<br>
-                                Confidence: {confidence:.1%}
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            # Metrics (using actual model predictions, not random)
-                            expected_return = confidence * 5 if movement_prediction == "Positive" else -confidence * 5
-                            risk_score = (1 - confidence) * 10
-                            volatility = (1 - confidence) * 40
-                            
-                            col_a, col_b, col_c = st.columns(3)
-                            col_a.metric("Expected Return", f"{expected_return:.2f}%")
-                            col_b.metric("Risk Score", f"{risk_score:.1f}/10")
-                            col_c.metric("Volatility", f"{volatility:.1f}%")
-                            
-                            # Prediction chart
-                            dates = pd.date_range(start=datetime.now(), periods=prediction_days, freq='D')
-                            prices = 100 + np.cumsum(np.random.randn(prediction_days) * 2)
-                            
-                            fig = go.Figure()
-                            fig.add_trace(go.Scatter(
-                                x=dates,
-                                y=prices,
-                                mode='lines+markers',
-                                name='Predicted Price',
-                                line=dict(color='blue', width=3)
-                            ))
-                            
-                            fig.update_layout(
-                                title=f"{symbol} Price Prediction",
-                                xaxis_title="Date",
-                                yaxis_title="Price ($)",
-                                hovermode='x unified'
-                            )
-                            
-                            st.plotly_chart(fig, use_container_width=True)
-
+                            st.error(f"Unsupported model type: {model_type}")
+                            st.info("Please select a valid model type from the sidebar.")
+                            st.stop()
                     except Exception as e:
                         st.error(f"Error loading or running model: {str(e)}")
-                        raise e
+                        st.stop()
 
 with tab2:
     st.header("Historical Analysis")

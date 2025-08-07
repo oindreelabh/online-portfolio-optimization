@@ -3,3 +3,4 @@
 2025-08-07 21:05:58,341 - INFO - Betas: {'AAPL': np.float64(1.1934005456503043), 'TSLA': np.float64(1.7521860057661205), 'AMZN': np.float64(1.3876921393123478), 'MSFT': np.float64(1.1836297341734856), 'NVDA': np.float64(1.9496106476077881), 'GME': np.float64(1.3041295461042974), 'AMC': np.float64(1.0966733538025626), 'META': np.float64(1.5099065031517778), 'JPM': np.float64(0.9227535968435379), 'SPY': np.float64(1.0022749801661597), 'UNH': np.float64(0.49276240792266535), 'GOOGL': np.float64(1.2343843735450668)}
 2025-08-07 21:05:58,341 - INFO - Model saved successfully to models/capm_model.pkl
 2025-08-07 21:13:23,355 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/capm_model.pkl
+2025-08-07 21:41:54,780 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/capm_model.pkl

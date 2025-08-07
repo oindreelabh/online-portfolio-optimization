@@ -1,0 +1,6 @@
+2025-08-07 21:31:02,296 - INFO - Not enough data for AAPL to make predictions. Skipping.
+2025-08-07 21:31:02,296 - INFO - Not enough data for GOOGL to make predictions. Skipping.
+2025-08-07 21:31:02,296 - INFO - Not enough data for MSFT to make predictions. Skipping.
+2025-08-07 21:31:02,296 - INFO - Not enough data for TSLA to make predictions. Skipping.
+2025-08-07 21:31:02,296 - INFO - Sorted tickers by predicted returns: []
+2025-08-07 21:31:02,296 - INFO - Diversification check: Maximum allocation = 0.00% (limit: 25.00%)
