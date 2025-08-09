@@ -219,14 +219,23 @@ with tab1:
                             if not result['predictions'] or not result['suggested_allocations']:
                                 st.warning("No valid predictions or allocations generated. This may be due to insufficient data")
                                 st.info("Please try with different tickers or check if you have enough historical data.")
-                                st.error("Exiting due to missing predictions or allocations. Please check your data and try again.")
-                                sys.exit(1)
+                                # Do not exit the Streamlit app; stop this run block
+                                st.stop()
+                            
+                            # Sanitize predictions: drop non-finite and keep in plausible range
+                            clean_predictions = {
+                                t: float(np.clip(p, -0.3, 0.3))
+                                for t, p in result['predictions'].items()
+                                if p is not None and np.isfinite(p)
+                            }
+                            if len(clean_predictions) < len(result['predictions']):
+                                st.info("Some tickers returned invalid predictions and were skipped.")
                             
                             # Display predictions
                             st.subheader("Predicted Returns")
                             pred_df = pd.DataFrame([
                                 {'Ticker': ticker, 'Predicted Return': f"{pred:.4f}"}
-                                for ticker, pred in result['predictions'].items()
+                                for ticker, pred in clean_predictions.items()
                             ])
                             st.dataframe(pred_df, use_container_width=True)
                             
@@ -255,7 +264,8 @@ with tab1:
                                         names=list(result['suggested_allocations'].keys()),
                                         title="Suggested Portfolio Allocation"
                                     )
-                                    st.plotly_chart(fig_pie, use_container_width=True)
+                                    # Add unique key to avoid duplicate element IDs
+                                    st.plotly_chart(fig_pie, use_container_width=True, key="hybrid_alloc_pie")
                                 else:
                                     st.info("No allocation suggestions available")
                             
@@ -264,11 +274,10 @@ with tab1:
                             col_a, col_b, col_c = st.columns(3)
                             
                             # Calculate weighted return safely
-                            if result['predictions'] and result['suggested_allocations']:
+                            if clean_predictions and result['suggested_allocations']:
                                 weighted_return = sum(
-                                    pred * result['suggested_allocations'].get(ticker, 0)
-                                    for ticker, pred in result['predictions'].items()
-                                    if ticker in result['suggested_allocations']
+                                    clean_predictions.get(t, 0.0) * result['suggested_allocations'].get(t, 0.0)
+                                    for t in result['suggested_allocations'].keys()
                                 )
                                 
                                 # Safe calculation of diversification score
@@ -283,127 +292,22 @@ with tab1:
                                 col_a.metric("Expected Portfolio Return", "N/A")
                                 col_b.metric("Diversification Score", "N/A")
                                 col_c.metric("Number of Holdings", "0")
-                            
                         else:
                             st.error(f"Prediction failed: {result['message']}")
-                        
-                    except Exception as e:
-                        st.error(f"Error running hybrid model: {str(e)}")
-                        st.info("This error may occur due to insufficient data, model compatibility issues, or missing features in the dataset.")
-                        
-                        # Show debug information without raising the exception
-                        with st.expander("Debug Information"):
-                            st.code(f"Error details: {str(e)}")
-                            st.write(f"Selected tickers: {tickers}")
-                            st.write(f"Data path: {data_path}")
-                            st.write(f"Model paths:")
-                            st.write(f"  - LSTM: {lstm_model_path}")
-                            st.write(f"  - Scaler: {lstm_scaler_path}")
-                            st.write(f"  - OGDM: {online_model_path}")
-
-                else:
-                    # Original prediction logic for other models
-                    base_model_dir = os.path.join(project_root, "models")
-                    model_filename = model_path_dict.get(model_type, "default_model.pkl")
-                    model_path = os.path.join(base_model_dir, model_filename)
-                    
-                    # Load and predict with actual model
-                    if not os.path.exists(model_path):
-                        st.error(f"Model file not found: {model_path}")
-                        raise FileNotFoundError(f"Required model file not found: {model_path}")
-                    
-                    try:
-                        if model_type == "markowitz":
-                            # Use Markowitz model for portfolio optimization
-                            model = MarkowitzOptimizer.load_model(model_path)
-                            
-                            # For Markowitz, we don't predict movement but show portfolio optimization
-                            if model.mean_returns is not None and model.cov_matrix is not None:
-                                # Get optimal weights
-                                optimal_weights = model.optimize()
-                                
-                                # Calculate portfolio statistics
-                                portfolio_return, portfolio_vol, sharpe_ratio = model.portfolio_stats(optimal_weights)
-                                
-                                # Display optimization results
-                                st.success("Portfolio Optimization Complete")
-                                
-                                # Show optimal allocation
-                                allocation_df = pd.DataFrame([
-                                    {'Asset': ticker, 'Weight': f"{weight:.2%}"}
-                                    for ticker, weight in zip(model.tickers, optimal_weights)
-                                ])
-                                st.subheader("Optimal Portfolio Allocation")
-                                st.dataframe(allocation_df, use_container_width=True)
-                                
-                                # Portfolio metrics
-                                col_a, col_b, col_c = st.columns(3)
-                                col_a.metric("Expected Annual Return", f"{portfolio_return:.2%}")
-                                col_b.metric("Annual Volatility", f"{portfolio_vol:.2%}")
-                                col_c.metric("Sharpe Ratio", f"{sharpe_ratio:.3f}")
-                                
-                                # Pie chart of allocation
-                                fig_pie = px.pie(
-                                    values=optimal_weights,
-                                    names=model.tickers,
-                                    title="Optimal Portfolio Allocation"
-                                )
-                                st.plotly_chart(fig_pie, use_container_width=True)
-                            else:
-                                st.error("Model data not available. Please retrain the model.")
-                        
-                        elif model_type == "capm":
-                            # Add CAPM model handling
-                            
-                            model = CAPMOptimizer.load_model(model_path)
-                            
-                            # Get data path for CAPM
-                            data_path = os.path.join(project_root, "data", "processed", "stock_prices_historical.csv")
-                            
-                            if not os.path.exists(data_path):
-                                st.error(f"Data file not found: {data_path}")
-                                st.stop()
-                            
-                            # Set CSV file path for the loaded model
-                            model.csv_file_path = data_path
-                            
-                            # Run CAPM optimization
-                            weights, expected_returns, betas = model.optimize_portfolio(market_return=0.10)
-                            
-                            # Display CAPM results
-                            st.success("CAPM Portfolio Optimization Complete")
-                            
-                            # Show optimal allocation
-                            allocation_df = pd.DataFrame([
-                                {'Asset': ticker, 'Weight': f"{weight:.2%}", 'Beta': f"{betas[ticker]:.3f}", 'Expected Return': f"{expected_returns[ticker]:.2%}"}
-                                for ticker, weight in weights.items()
-                            ])
-                            st.subheader("CAPM Optimal Portfolio")
-                            st.dataframe(allocation_df, use_container_width=True)
-                            
-                            # Portfolio metrics
-                            portfolio_return = sum(weight * expected_returns[ticker] for ticker, weight in weights.items())
-                            avg_beta = sum(weight * betas[ticker] for ticker, weight in weights.items())
-                            
-                            col_a, col_b, col_c = st.columns(3)
-                            col_a.metric("Portfolio Expected Return", f"{portfolio_return:.2%}")
-                            col_b.metric("Portfolio Beta", f"{avg_beta:.3f}")
-                            col_c.metric("Risk-Free Rate", f"{model.risk_free_rate:.2%}")
-                            
-                            # Pie chart of allocation
-                            fig_pie = px.pie(
-                                values=list(weights.values()),
-                                names=list(weights.keys()),
-                                title="CAPM Optimal Portfolio Allocation"
-                            )
-                            st.plotly_chart(fig_pie, use_container_width=True)
-                        else:
-                            st.error(f"Unsupported model type: {model_type}")
-                            st.info("Please select a valid model type from the sidebar.")
-                            st.stop()
                     except Exception as e:
                         st.error(f"Error loading or running model: {str(e)}")
                         st.stop()
+    
+    # Debug information expander
+    with st.expander("Debug Information", expanded=False):
+        st.write("This section provides additional information for debugging purposes.")
+        st.write(f"Selected Model Type: {model_type}")
+        st.write(f"Tickers: {tickers}")
+        st.write(f"Current Allocations: {current_allocations}")
+        if model_type == "lstm-ogdm hybrid":
+            st.write(f"Sequence Length: {sequence_length}")
+        st.write("---")
+        st.write("If you encounter any issues, please check the above parameters and ensure that the model and data files are correctly set up.")
 
 with tab2:
     st.header("Historical Analysis")
@@ -424,12 +328,14 @@ with tab2:
     with col1:
         # Price chart
         fig_price = px.line(historical_data, x='Date', y='Price', title='Historical Price Movement')
-        st.plotly_chart(fig_price, use_container_width=True)
+        # Add unique key
+        st.plotly_chart(fig_price, use_container_width=True, key="hist_price")
     
     with col2:
         # Volume chart
         fig_volume = px.bar(historical_data, x='Date', y='Volume', title='Trading Volume')
-        st.plotly_chart(fig_volume, use_container_width=True)
+        # Add unique key
+        st.plotly_chart(fig_volume, use_container_width=True, key="hist_volume")
     
     # Statistics
     st.subheader("Statistical Summary")
@@ -460,7 +366,8 @@ with tab3:
         
         fig_metrics = px.bar(metrics_df, x='Metric', y='Value', title='Model Performance Metrics')
         fig_metrics.update_layout(yaxis=dict(range=[0, 1]))
-        st.plotly_chart(fig_metrics, use_container_width=True)
+        # Add unique key
+        st.plotly_chart(fig_metrics, use_container_width=True, key="perf_metrics")
     
     with col2:
         st.subheader("Confusion Matrix")
@@ -470,7 +377,8 @@ with tab3:
                           aspect="auto",
                           title="Confusion Matrix",
                           labels=dict(x="Predicted", y="Actual"))
-        st.plotly_chart(fig_cm, use_container_width=True)
+        # Add unique key
+        st.plotly_chart(fig_cm, use_container_width=True, key="perf_cm")
     
     # Feature importance
     st.subheader("Feature Importance")
@@ -484,19 +392,14 @@ with tab3:
     
     fig_importance = px.bar(feature_df, x='Importance', y='Feature', 
                            orientation='h', title='Feature Importance')
-    st.plotly_chart(fig_importance, use_container_width=True)
+    # Add unique key
+    st.plotly_chart(fig_importance, use_container_width=True, key="feat_importance")
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>Market Movement Prediction Dashboard | Built with Streamlit</p>
-</div>
-""", unsafe_allow_html=True)
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666;'>
-    <p>Market Movement Prediction Dashboard | Built with Streamlit</p>
+    <p>Portfolio Optimization Dashboard | Built with Streamlit</p>
 </div>
 """, unsafe_allow_html=True)
 

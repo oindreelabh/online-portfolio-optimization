@@ -19,59 +19,113 @@ def load_lstm_model(model_path, scaler_path):
     target_col = scaler_dict['target_col']
     return model, scaler, feature_cols, target_col
 
-def predict_next(model, scaler, feature_cols, recent_data, sequence_length=10):
-    # recent_data: DataFrame with latest `sequence_length` rows
-    X_features = recent_data[feature_cols].values[-sequence_length:]
+def _prepare_scaled_features(recent_data: pd.DataFrame, feature_cols, target_col, scaler, sequence_length: int):
+    """
+    Prepare a scaled feature matrix for the last `sequence_length` rows using the provided scaler.
+    It appends a dummy target column to match scaler expectations.
+    """
+    # Ensure we have enough rows after cleaning
+    data = recent_data.copy()
+    data = data.sort_index()  # keep time order if index is datetime/increasing
+    # Fill and drop any remaining NaNs for the used columns
+    data[feature_cols + [target_col]] = data[feature_cols + [target_col]].ffill().bfill()
+    if len(data) < sequence_length:
+        raise ValueError(f"Insufficient rows after cleaning. Need {sequence_length}, have {len(data)}")
 
-    # Stack dummy target column for scaling
-    dummy_target = np.zeros((sequence_length, 1))
-    recent_for_scaling = np.hstack([X_features, dummy_target])
+    # Take exactly the last `sequence_length` rows
+    window = data.iloc[-sequence_length:].copy()
 
-    all_cols = feature_cols + ['close']
-    recent_for_scaling_df = pd.DataFrame(recent_for_scaling, columns=all_cols)
+    # Build array with dummy target for scaling
+    x_features = window[feature_cols].astype(float).values
+    dummy_target = np.zeros((sequence_length, 1), dtype=np.float32)
+    all_cols = feature_cols + [target_col]
+    recent_for_scaling_df = pd.DataFrame(np.hstack([x_features, dummy_target]), columns=all_cols)
+
+    # Scale using the saved scaler (fit on features + target)
     recent_scaled_df = pd.DataFrame(scaler.transform(recent_for_scaling_df), columns=all_cols)
-    recent_scaled = recent_scaled_df.iloc[:, :-1].values
+    x_scaled = recent_scaled_df.iloc[:, :-1].values  # scaled features only
+    last_close = float(window[target_col].iloc[-1])
 
-    X = recent_scaled.reshape(1, sequence_length, len(feature_cols))
-    pred_scaled = model.predict(X)
-    pred_value = pred_scaled.item()
+    return x_scaled, last_close, all_cols
 
-    # Inverse transform to get the actual prediction
-    dummy_df = pd.DataFrame(np.zeros((1, len(feature_cols) + 1)), columns=all_cols)
-    dummy_df.iloc[0, :-1] = recent_scaled[-1]
-    dummy_df.iloc[0, -1] = pred_value
-    pred_actual = scaler.inverse_transform(dummy_df)[0, -1]
+def predict_next(model, scaler, feature_cols, target_col, recent_data, sequence_length=10):
+    """
+    Predict the next-step return using the LSTM model.
+    Returns a clipped percent return (e.g., 0.01 for +1%).
+    """
+    x_scaled, last_close, all_cols = _prepare_scaled_features(
+        recent_data, feature_cols, target_col, scaler, sequence_length
+    )
 
-    return pred_actual
+    # LSTM expects shape (1, seq_len, n_features)
+    X = x_scaled.reshape(1, sequence_length, len(feature_cols))
+    pred_scaled = model.predict(X, verbose=0)
+    pred_scaled_value = float(np.ravel(pred_scaled)[-1])
+
+    # Inverse transform to price by stitching scaled features + predicted scaled target
+    dummy_row = np.zeros((1, len(all_cols)), dtype=np.float32)
+    dummy_row[0, :-1] = x_scaled[-1]  # last scaled feature row
+    dummy_row[0, -1] = pred_scaled_value
+    pred_actual = float(scaler.inverse_transform(dummy_row)[0, -1])
+
+    # Convert to percent return; guard and clip
+    if not np.isfinite(pred_actual) or not np.isfinite(last_close) or last_close == 0:
+        return np.nan
+    predicted_return = (pred_actual - last_close) / last_close
+    # Clip to a realistic next-step range
+    predicted_return = float(np.clip(predicted_return, -0.3, 0.3))
+    return predicted_return
 
 def load_online_model(model_path, n_features):
     model = OnlineGradientDescentMomentum(n_features=n_features, model_path=model_path)
     return model
 
-def predict_online(model, feature_cols, recent_data):
-    # Getting the expected number of features from the model
+def predict_online(model, scaler, feature_cols, target_col, recent_data, sequence_length=10):
+    """
+    Predict next-step return using the online model.
+    - Standardizes features with the same scaler to avoid magnitude blowups.
+    - Auto-detects if the model output looks like a price; otherwise treats as return.
+    - Clips output to a realistic range.
+    """
+    # Prepare scaled features for the last window
+    x_scaled, last_close, _ = _prepare_scaled_features(
+        recent_data, feature_cols, target_col, scaler, sequence_length
+    )
+
+    # Align feature count with model weights if needed
     expected_features = len(model.weights)
-    actual_features = len(feature_cols)
-
-    # Handling feature mismatch
+    actual_features = x_scaled.shape[1]
     if expected_features != actual_features:
-        logger.warning(f"Feature count mismatch: model expects {expected_features} features but data has {actual_features}")
-
-        # Option 1: If model expects more features, pad with zeros
         if expected_features > actual_features:
-            X = recent_data[feature_cols].values
-            padding = np.zeros((X.shape[0], expected_features - actual_features))
-            X = np.hstack([X, padding])
-            logger.info(f"Padded features from {actual_features} to {expected_features}")
-        # Option 2: If model expects fewer features, truncate
+            padding = np.zeros((x_scaled.shape[0], expected_features - actual_features))
+            x_scaled = np.hstack([x_scaled, padding])
         else:
-            X = recent_data[feature_cols].values[:, :expected_features]
-            logger.info(f"Truncated features from {actual_features} to {expected_features}")
-    else:
-        X = recent_data[feature_cols].values
+            x_scaled = x_scaled[:, :expected_features]
 
-    preds = model.predict(X)
-    return preds[-1]  # last prediction
+    # Model prediction for each row in the window; take last as next-step
+    preds = model.predict(x_scaled)
+    raw_pred = float(np.ravel(preds)[-1])
+
+    if not np.isfinite(raw_pred):
+        return np.nan
+
+    # Try both interpretations and choose the more plausible one
+    candidate_return_raw = raw_pred  # if the model already predicts return
+    candidate_return_from_price = (raw_pred - last_close) / last_close if last_close != 0 else np.nan
+
+    # Heuristic: choose the candidate with smaller absolute value within sane bounds
+    choices = []
+    if np.isfinite(candidate_return_raw):
+        choices.append(candidate_return_raw)
+    if np.isfinite(candidate_return_from_price):
+        choices.append(candidate_return_from_price)
+
+    if not choices:
+        return np.nan
+
+    picked = min(choices, key=lambda v: abs(v))
+    picked = float(np.clip(picked, -0.3, 0.3))
+    return picked
 
 def suggest_rebalance(predictions, current_allocations):
     # predictions: dict {ticker: predicted_return}
@@ -105,7 +159,7 @@ def suggest_rebalance(predictions, current_allocations):
 
     # Normalize to ensure weights sum to 1
     total_weight = sum(suggested.values())
-    suggested = {t: round(w/total_weight, 2) for t, w in suggested.items()}
+    suggested = {t: round(w/total_weight, 4) for t, w in suggested.items()}
     
     # Final check and redistribution if any allocation still exceeds 25% after normalization
     while any(weight > max_allocation for weight in suggested.values()):
@@ -135,7 +189,7 @@ def suggest_rebalance(predictions, current_allocations):
     
     # Final normalization
     total_weight = sum(suggested.values())
-    suggested = {t: round(w/total_weight, 2) for t, w in suggested.items()}
+    suggested = {t: round(w/total_weight, 4) for t, w in suggested.items()}
     
     # Log diversification compliance
     max_actual = max(suggested.values()) if suggested else 0
@@ -148,18 +202,36 @@ def hybrid_predict_and_rebalance(recent_data, lstm_model_path, lstm_scaler_path,
         lstm_model, scaler, feature_cols, target_col = load_lstm_model(lstm_model_path, lstm_scaler_path)
         online_model = load_online_model(online_model_path, n_features=len(feature_cols))
         hybrid_preds = {}
-        
+
         for ticker in tickers:
             ticker_data = recent_data[recent_data['ticker'] == ticker]
             if len(ticker_data) < sequence_length:
                 logger.info(f"Not enough data for {ticker} to make predictions. Skipping.")
                 continue
-            lstm_pred = predict_next(lstm_model, scaler, feature_cols, ticker_data, sequence_length)
-            online_pred = predict_online(online_model, feature_cols, ticker_data)
-            # Combine predictions using a simple average / can try weighted later
-            hybrid_pred = (lstm_pred + online_pred) / 2
-            hybrid_preds[ticker] = hybrid_pred
-            
+
+            # LSTM predicted return
+            lstm_ret = predict_next(lstm_model, scaler, feature_cols, target_col, ticker_data, sequence_length)
+            # Online model predicted return (standardized features)
+            online_ret = predict_online(online_model, scaler, feature_cols, target_col, ticker_data, sequence_length)
+
+            # Skip if both are invalid
+            vals = [v for v in [lstm_ret, online_ret] if np.isfinite(v)]
+            if not vals:
+                logger.warning(f"No valid predictions for {ticker}. Skipping.")
+                continue
+
+            # Simple average of available return estimates, then clip
+            hybrid_ret = float(np.clip(np.mean(vals), -0.3, 0.3))
+            hybrid_preds[ticker] = hybrid_ret
+
+        if not hybrid_preds:
+            return {
+                'status': 'error',
+                'predictions': {},
+                'suggested_allocations': {},
+                'message': 'No valid predictions generated. Check data quality and model artifacts.'
+            }
+
         suggested = suggest_rebalance(hybrid_preds, current_allocations)
         return {
             'status': 'success',
