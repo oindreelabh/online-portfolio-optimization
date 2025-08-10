@@ -11,5 +11,3 @@ SUBREDDITS = [
 from dotenv import load_dotenv
 
 load_dotenv()
-
-TABLE_NAME = "stock_prices"
