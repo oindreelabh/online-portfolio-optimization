@@ -78,10 +78,11 @@ model_path_dict = {
     "capm": "capm_model.pkl"
 }
 
-# Main dashboard layout
-tab1, tab2, tab3 = st.tabs(["Portfolio Optimization", "Historical Analysis", "Model Performance"])
-
-with tab1:
+def render_tab_portfolio(model_type: str, project_root: str) -> None:
+    """
+    Render the Portfolio Optimization & Prediction tab.
+    Encapsulates sidebar inputs, hybrid/markowitz/capm execution, and results rendering.
+    """
     st.header("Portfolio Optimization & Prediction")
     
     col1, col2 = st.columns([1, 2])
@@ -92,7 +93,7 @@ with tab1:
         # Portfolio configuration for hybrid model
         if model_type == "lstm-ogdm hybrid":
             # Multiple stock selection
-            default_tickers = ["AAPL", "GOOGL", "MSFT", "TSLA"]
+            default_tickers = ["AAPL", "AMZN"]
             tickers_input = st.text_input(
                 "Stock Tickers (comma-separated)", 
                 value=",".join(default_tickers),
@@ -124,7 +125,7 @@ with tab1:
                 st.write(f"• {ticker}: {weight:.2%}")
             
             # Sequence length for LSTM
-            sequence_length = st.slider("LSTM Sequence Length", 5, 30, 10)
+            sequence_length = st.slider("LSTM Sequence Length", 5, 30, 5)
             
         else:
             # Single stock input for other models
@@ -309,7 +310,10 @@ with tab1:
         st.write("---")
         st.write("If you encounter any issues, please check the above parameters and ensure that the model and data files are correctly set up.")
 
-with tab2:
+def render_tab_historical() -> None:
+    """
+    Render the Historical Analysis tab with price/volume charts and stats.
+    """
     st.header("Historical Analysis")
     
     # Sample historical data
@@ -350,7 +354,10 @@ with tab2:
     with col4:
         st.metric("Min Price", f"${historical_data['Price'].min():.2f}")
 
-with tab3:
+def render_tab_performance() -> None:
+    """
+    Render the Model Performance Metrics tab with metrics, confusion matrix, and feature importance.
+    """
     st.header("Model Performance Metrics")
     
     # Performance metrics
@@ -394,6 +401,19 @@ with tab3:
                            orientation='h', title='Feature Importance')
     # Add unique key
     st.plotly_chart(fig_importance, use_container_width=True, key="feat_importance")
+
+# Main dashboard layout
+tab1, tab2, tab3 = st.tabs(["Portfolio Optimization", "Historical Analysis", "Model Performance"])
+
+with tab1:
+    # Call the refactored function instead of inline code
+    render_tab_portfolio(model_type, project_root)
+
+with tab2:
+    render_tab_historical()
+
+with tab3:
+    render_tab_performance()
 
 # Footer
 st.markdown("---")
