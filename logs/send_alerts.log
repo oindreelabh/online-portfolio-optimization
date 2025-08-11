@@ -1,0 +1,7 @@
+2025-08-11 15:05:06,805 - INFO - Loading market data from data/processed/stock_prices_latest.csv
+2025-08-11 15:07:08,925 - INFO - Loading market data from data/processed/stock_prices_latest.csv
+2025-08-11 15:07:08,939 - INFO - Loading sentiment data from data/processed/reddit_posts.csv
+2025-08-11 15:07:08,968 - INFO - Loading sentiment data from data/processed/finance_news.csv
+2025-08-11 15:07:08,970 - WARNING - Skipping sentiment file data/processed/finance_news.csv: No sentiment score column detected.
+2025-08-11 15:07:08,977 - INFO - Alert report written to evaluation_results/alerts/alerts_weekly_20250811_150708.csv
+2025-08-11 15:07:13,328 - INFO - Email sent to 1 recipient(s).

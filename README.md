@@ -179,6 +179,40 @@ python -m src.evaluation.evaluate_lstm \
   --output_dir evaluation_results/lstm
 ```
 
+#### Alerts (Email Notifications)
+Configure SMTP and email addresses in .env:
+```
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_user
+SMTP_PASSWORD=your_smtp_password
+EMAIL_FROM=alerts@yourdomain.com
+EMAIL_TO=you@yourdomain.com,teammate@yourdomain.com
+```
+
+Send a weekly alert (dry run prints content instead of sending):
+```bash
+python -m src.alerts.send_alerts \
+  --yf_path data/processed/stock_prices_latest.csv \
+  --reddit_path data/processed/reddit_posts.csv \
+  --news_path data/processed/finance_news.csv \
+  --period weekly \
+  --dry_run
+```
+
+Send a monthly alert:
+```bash
+python -m src.alerts.send_alerts \
+  --yf_path data/processed/stock_prices_latest.csv \
+  --period monthly
+```
+
+Options:
+- --threshold_return: override return threshold (default 5% weekly, 10% monthly)
+- --threshold_sentiment: override abs sentiment threshold (default 0.3)
+- --output_dir: write a CSV report in addition to email
+- --email_to / --email_from / --smtp_*: override .env at runtime
+
 ### 3. Dashboard
 Launch the interactive dashboard:
 ```bash

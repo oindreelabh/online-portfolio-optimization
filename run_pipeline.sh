@@ -127,15 +127,25 @@ capm_model_name="capm_model.pkl"
 ## Evaluate Hybrid model with portfolio backtesting
 #python src/evaluation/evaluate_hybrid.py --data_path data/processed/test_data.csv --lstm_model_path models/lstm_model.keras --lstm_scaler_path models/lstm_model_scaler.pkl --online_model_path models/ogdm_model.pkl --sequence_length 5 --target_col close --output_dir evaluation_results/hybrid
 
-echo "Starting Streamlit dashboard..."
-echo "Launching Portfolio Optimization Dashboard..."
-echo "Dashboard will be available at: http://localhost:8501"
-echo "Press Ctrl+C to stop the dashboard"
-streamlit run src/dashboard/streamlit_dashboard.py --server.port 8501 --server.address localhost
-if [ $? -ne 0 ]; then
-    echo "Error running Streamlit dashboard."
-    exit 1
-fi
+# Run alerts before launching dashboard (will send email if SMTP/env are set)
+echo "Step: Generating market alerts and sending email..."
+python -m src.alerts.send_alerts \
+  --yf_path "$processed_dir/$yFinance_latest" \
+  --reddit_path "$processed_dir/$reddit" \
+  --news_path "$processed_dir/$finlayer" \
+  --period weekly \
+  --subject_prefix "Portfolio" \
+  --output_dir "evaluation_results/alerts" || echo "Warning: Alerts step failed (continuing)."
+
+# echo "Starting Streamlit dashboard..."
+# echo "Launching Portfolio Optimization Dashboard..."
+# echo "Dashboard will be available at: http://localhost:8501"
+# echo "Press Ctrl+C to stop the dashboard"
+# streamlit run src/dashboard/streamlit_dashboard.py --server.port 8501 --server.address localhost
+# if [ $? -ne 0 ]; then
+#     echo "Error running Streamlit dashboard."
+#     exit 1
+# fi
 
 echo "Pipeline completed successfully."
 

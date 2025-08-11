@@ -5,7 +5,8 @@ TICKERS = [
 ]
 
 SUBREDDITS = [
-    "stocks", "wallstreetbets", "investing", "stockmarket", "pennystocks"
+    "stocks", "wallstreetbets", "investing", "stockmarket", "pennystocks",
+    "IndianStockMarket"
 ]
 
 from dotenv import load_dotenv
