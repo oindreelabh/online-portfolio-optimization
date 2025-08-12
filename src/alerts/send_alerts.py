@@ -1,13 +1,9 @@
 """
 Automated alert system for sending weekly or monthly market and sentiment summaries via email.
 
-- Reads market price data (expects: date, ticker, close).
-- Optionally reads sentiment data (expects: date, ticker or tickers, and a sentiment score column).
+- Reads a single processed CSV (expects at least: date, ticker, close, and a sentiment column provided via --sentiment_col).
 - Aggregates metrics over the selected period and flags significant events.
 - Sends an HTML/text email via SMTP with TLS.
-
-Env vars (overridable via CLI):
-- SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, EMAIL_FROM, EMAIL_TO
 """
 
 import os
@@ -59,53 +55,27 @@ def read_market_data(yf_path: str) -> pd.DataFrame:
     return df
 
 
-def detect_sentiment_column(df: pd.DataFrame) -> Optional[str]:
-    """Detect a plausible sentiment score column name."""
-    candidates = {
-        "sentiment", "sentiment_score", "finbert_sentiment", "vader_sentiment",
-        "sentiment_vader", "sentiment_finbert", "polarity", "score"
-    }
-    for col in df.columns:
-        if col.lower() in candidates:
-            return col
-    return None
-
-
-def normalize_sentiment_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalize sentiment data to columns: date, ticker, sentiment."""
-    df = df.copy()
-    df.columns = [c.strip().lower() for c in df.columns]
-    if "date" not in df.columns:
-        raise ValueError("Sentiment CSV must contain 'date'.")
-    if "ticker" not in df.columns:
-        if "tickers" in df.columns:
-            import ast
-            def to_list(x):
-                if isinstance(x, list):
-                    return x
-                if isinstance(x, str):
-                    s = x.strip()
-                    if s.startswith("[") and s.endswith("]"):
-                        try:
-                            val = ast.literal_eval(s)
-                            return val if isinstance(val, list) else [str(val)]
-                        except Exception:
-                            return [s]
-                    return [p.strip() for p in s.split(",")] if "," in s else [s]
-                return []
-            df["tickers"] = df["tickers"].apply(to_list)
-            df = df.explode("tickers").rename(columns={"tickers": "ticker"})
-        else:
-            raise ValueError("Sentiment CSV must contain 'ticker' or 'tickers'.")
-    sent_col = detect_sentiment_column(df)
-    if not sent_col:
-        raise ValueError("No sentiment score column detected.")
-    df = df.rename(columns={sent_col: "sentiment"})
-    # Ensure timezone-aware (UTC) to align with period window
-    df["date"] = pd.to_datetime(df["date"], utc=True)
-    df = df[["date", "ticker", "sentiment"]]
-    df = df[df["ticker"].isin(TICKERS)].copy()
-    return df
+def aggregate_sentiment(df: pd.DataFrame, period: str, sentiment_col: str) -> pd.DataFrame:
+    """Aggregate mean sentiment and sample count per ticker in the window using the specified sentiment column."""
+    s_col = sentiment_col.strip().lower()
+    if s_col not in df.columns:
+        raise ValueError(f"Sentiment column '{sentiment_col}' not found in data.")
+    start_time, end_time = compute_period_window(period)
+    dfp = df.copy()
+    # Ensure date is datetime and filtered to window
+    dfp["date"] = pd.to_datetime(dfp["date"], utc=True)
+    dfp = dfp[(dfp["date"] >= start_time) & (dfp["date"] <= end_time)]
+    if dfp.empty:
+        return pd.DataFrame(columns=["ticker", "mean_sentiment", "samples"])
+    # Drop NaNs in sentiment column before aggregation
+    dfp = dfp.dropna(subset=[s_col])
+    if dfp.empty:
+        return pd.DataFrame(columns=["ticker", "mean_sentiment", "samples"])
+    return (
+        dfp.groupby("ticker")
+        .agg(mean_sentiment=(s_col, "mean"), samples=(s_col, "count"))
+        .reset_index()
+    )
 
 
 def compute_period_window(period: str) -> Tuple[datetime, datetime]:
@@ -143,19 +113,6 @@ def compute_period_returns(df: pd.DataFrame, period: str) -> pd.DataFrame:
         })
     out = pd.DataFrame(rows)
     return out.sort_values("period_return", ascending=False)
-
-
-def aggregate_sentiment(df: pd.DataFrame, period: str) -> pd.DataFrame:
-    """Aggregate mean sentiment and sample count per ticker in the window."""
-    start_time, end_time = compute_period_window(period)
-    dfp = df[(df["date"] >= start_time) & (df["date"] <= end_time)].copy()
-    if dfp.empty:
-        return pd.DataFrame(columns=["ticker", "mean_sentiment", "samples"])
-    return (
-        dfp.groupby("ticker")
-        .agg(mean_sentiment=("sentiment", "mean"), samples=("sentiment", "count"))
-        .reset_index()
-    )
 
 
 def join_metrics(returns_df: pd.DataFrame, sentiment_df: Optional[pd.DataFrame]) -> pd.DataFrame:
@@ -326,9 +283,8 @@ def write_report_csv(metrics_df: pd.DataFrame, output_dir: Optional[str], period
 def main():
     """CLI entrypoint for generating and sending alerts."""
     parser = argparse.ArgumentParser(description="Send weekly/monthly market & sentiment alerts via email.")
-    parser.add_argument("--yf_path", required=True, help="Path to market CSV (date, ticker, close).")
-    parser.add_argument("--reddit_path", help="Optional Reddit sentiment CSV.")
-    parser.add_argument("--news_path", help="Optional news sentiment CSV.")
+    parser.add_argument("--data_path", required=True, help="Path to processed CSV (date, ticker, close, and sentiment column).")
+    parser.add_argument("--sentiment_col", required=True, help="Name of the sentiment column to aggregate.")
     parser.add_argument("--period", choices=["weekly", "monthly"], default="weekly", help="Alert period.")
     parser.add_argument("--threshold_return", type=float, help="Return threshold (5% weekly, 10% monthly by default).")
     parser.add_argument("--threshold_sentiment", type=float, default=0.3, help="Abs sentiment threshold.")
@@ -342,24 +298,12 @@ def main():
     parser.add_argument("--output_dir", help="Optional directory to save CSV alert report.")
     args = parser.parse_args()
 
-    logger.info(f"Loading market data from {args.yf_path}")
-    market_df = read_market_data(args.yf_path)
+    logger.info(f"Loading processed data from {args.data_path}")
+    market_df = read_market_data(args.data_path)  # ensures date/ticker/close, lowercases columns, filters TICKERS
+
     returns_df = compute_period_returns(market_df, args.period)
+    sentiment_agg = aggregate_sentiment(market_df, args.period, args.sentiment_col)
 
-    # Load optional sentiment sources and aggregate
-    sentiment_df = None
-    for path in [args.reddit_path, args.news_path]:
-        if not path:
-            continue
-        try:
-            logger.info(f"Loading sentiment data from {path}")
-            raw = pd.read_csv(path)
-            norm = normalize_sentiment_data(raw)
-            sentiment_df = norm if sentiment_df is None else pd.concat([sentiment_df, norm], ignore_index=True)
-        except Exception as exc:
-            logger.warning(f"Skipping sentiment file {path}: {exc}")
-
-    sentiment_agg = aggregate_sentiment(sentiment_df, args.period) if sentiment_df is not None else None
     metrics_df = join_metrics(returns_df, sentiment_agg)
 
     events = extract_significant_events(

@@ -1,7 +1,8 @@
 TICKERS = [
     "AAPL", "TSLA", "AMZN", "MSFT", "NVDA",
     "GME", "AMC", "META","JPM", "SPY",
-    "UNH", "GOOGL"
+    "UNH", "GOOGL", "CCEP" #Coca-Cola
+    ,"CFLT" #Confluent
 ]
 
 SUBREDDITS = [

@@ -51,11 +51,11 @@ def fetch_and_store_historical_data(filename, raw_dir, market_ticker='^GSPC'):
 
 def fetch_and_store_latest_data(filename, raw_dir, market_ticker='^GSPC'):
     try:
-        logger.info("Fetching latest data for last 2 weeks...")
+        logger.info("Fetching latest data for last 1 month...")
         # Combine stock tickers with market ticker
         all_tickers = TICKERS + [market_ticker]
         logger.info(f"Including market ticker: {market_ticker}")
-        df = fetch_yfinance_data(all_tickers, period="14d", interval="1d")
+        df = fetch_yfinance_data(all_tickers, period="1mo", interval="1d")
         csv_path = write_df_to_csv(df, raw_dir, filename)
         logger.info(f"Latest data written successfully to {csv_path}.")
     except Exception as e:
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     logger.info("Starting YFinance data fetching and storing...")
     parser = argparse.ArgumentParser(description="Fetch and store YFinance data.")
     parser.add_argument('--historical', type=str, help="Fetch historical data for last 5 years")
-    parser.add_argument('--latest', type=str, help="Fetch latest data for last 2 weeks")
+    parser.add_argument('--latest', type=str, help="Fetch latest data for last 1 month")
     parser.add_argument('--raw_dir', type=str, help="Directory for raw data files")
     parser.add_argument('--market_ticker', type=str, default='^GSPC', help="Market index ticker (default: S&P 500)")
     args = parser.parse_args()

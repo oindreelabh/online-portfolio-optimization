@@ -24,7 +24,6 @@ This project implements a sophisticated portfolio optimization system that combi
 │   ├── evaluation/           # Model evaluation and backtesting
 │   ├── dashboard/            # Streamlit dashboard
 │   └── utils/                # Utilities and constants
-├── notebooks/                # Jupyter notebooks for analysis
 ├── data/                     # Data storage (raw and processed)
 └── models/                   # Trained model artifacts
 ```
@@ -39,7 +38,7 @@ This project implements a sophisticated portfolio optimization system that combi
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd dissertation
+cd online-portfolio-optimization
 
 # Install dependencies
 pip install -r requirements.txt

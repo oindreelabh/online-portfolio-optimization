@@ -1,0 +1,6 @@
+2025-08-11 15:28:34,473 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-08-11 15:28:34,474 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-08-11 15:28:34,474 - INFO - Label Count: 3
+2025-08-11 16:21:29,802 - INFO - Using FinBERT model: ProsusAI/finbert
+2025-08-11 16:21:29,802 - INFO - LABELS: {0: 'positive', 1: 'negative', 2: 'neutral'}
+2025-08-11 16:21:29,803 - INFO - Label Count: 3
