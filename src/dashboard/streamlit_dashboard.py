@@ -81,16 +81,20 @@ model_path_dict = {
 def render_tab_portfolio(model_type: str, project_root: str) -> None:
     """
     Render the Portfolio Optimization & Prediction tab.
-    Encapsulates sidebar inputs, hybrid/markowitz/capm execution, and results rendering.
+    Supports hybrid (LSTM-OGDM), Markowitz (.pkl), and CAPM (.pkl) models.
     """
     st.header("Portfolio Optimization & Prediction")
+    
+    # Initialize shared variables to avoid reference errors in debug
+    tickers = []
+    current_allocations = {}
+    sequence_length = None
     
     col1, col2 = st.columns([1, 2])
     
     with col1:
         st.subheader("Portfolio Parameters")
         
-        # Portfolio configuration for hybrid model
         if model_type == "lstm-ogdm hybrid":
             # Multiple stock selection
             default_tickers = ["AAPL", "AMZN"]
@@ -126,27 +130,50 @@ def render_tab_portfolio(model_type: str, project_root: str) -> None:
             
             # Sequence length for LSTM
             sequence_length = st.slider("LSTM Sequence Length", 5, 30, 5)
-            
-        else:
-            # Single stock input for other models
-            symbol = st.text_input("Stock Symbol", value="AAPL", help="Enter stock ticker symbol")
-            
-            # Time horizon
-            prediction_days = st.slider("Prediction Horizon (days)", 1, 30, 5)
-            
-            # Technical indicators
-            st.subheader("Technical Indicators")
-            rsi = st.slider("RSI", 0.0, 100.0, 50.0)
-            macd = st.slider("MACD", -5.0, 5.0, 0.0)
-            bb_position = st.slider("Bollinger Band Position", 0.0, 1.0, 0.5)
-            volume_ratio = st.slider("Volume Ratio", 0.0, 5.0, 1.0)
-            
-            # Market sentiment
-            st.subheader("Market Sentiment")
-            vix = st.slider("VIX (Volatility Index)", 10.0, 80.0, 20.0)
-            market_sentiment = st.selectbox("Market Sentiment", ["Positive", "Neutral", "Negative"])
         
-        # Predict button
+        elif model_type == "markowitz":
+            st.markdown("Markowitz Mean-Variance Optimization")
+            tickers_input = st.text_input(
+                "Tickers (comma-separated)", 
+                value="AAPL,AMZN,MSFT,GOOGL",
+                help="Works with either (a) wide price CSV (date as index column + ticker columns) or (b) long format (date,ticker,close, ...). Auto-detects & pivots."
+            )
+            tickers = [t.strip().upper() for t in tickers_input.split(",") if t.strip()]
+            data_csv_path = st.text_input(
+                "Price / Feature CSV (long or wide)",
+                value=os.path.join(project_root, "data", "processed", "stock_prices_historical.csv"),
+                help="If long format: must contain columns date,ticker,close. Will be pivoted automatically to wide (close prices)."
+            )
+            target_return_input = st.number_input(
+                "Target Annual Return (0 = maximize Sharpe)",
+                min_value=0.0,
+                value=0.0,
+                step=0.01
+            )
+            target_return = target_return_input if target_return_input > 0 else None
+        
+        elif model_type == "capm":
+            st.markdown("CAPM-based Portfolio Optimization")
+            tickers_input = st.text_input(
+                "Tickers (comma-separated)",
+                value="AAPL,AMZN,MSFT,GOOGL",
+                help="Tickers must exist in returns CSV (long format)"
+            )
+            tickers = [t.strip().upper() for t in tickers_input.split(",") if t.strip()]
+            data_csv_path = st.text_input(
+                "Returns Data CSV (long format)",
+                value=os.path.join(project_root, "data", "processed", "capm_returns.csv"),
+                help="Columns required: date,ticker,returns"
+            )
+            market_ticker = st.text_input("Market Ticker", value="^GSPC")
+            market_return = st.number_input(
+                "Expected Market Return",
+                min_value=-1.0,
+                max_value=2.0,
+                value=0.10,
+                step=0.01
+            )
+        # Predict button (all models)
         predict_button = st.button("Generate Prediction", type="primary")
     
     with col2:
@@ -154,7 +181,6 @@ def render_tab_portfolio(model_type: str, project_root: str) -> None:
         
         if predict_button:
             with st.spinner("Generating predictions..."):
-                
                 if model_type == "lstm-ogdm hybrid":
                     # Load actual data from CSV file
                     data_path = os.path.join(project_root, "data", "processed", "recent_data_with_sentiment.csv")
@@ -298,17 +324,209 @@ def render_tab_portfolio(model_type: str, project_root: str) -> None:
                     except Exception as e:
                         st.error(f"Error loading or running model: {str(e)}")
                         st.stop()
+                
+                elif model_type == "markowitz":
+                    try:
+                        def ensure_wide_price_csv(original_path: str, proj_root: str) -> str:
+                            """
+                            Ensure a wide-format CSV (date index, ticker columns of close prices) exists.
+                            If the provided CSV is long format (contains 'ticker' column), pivot it.
+                            
+                            Returns path to a wide-format CSV file.
+                            """
+                            if not os.path.exists(original_path):
+                                raise FileNotFoundError(f"Price CSV not found: {original_path}")
+                            
+                            df_raw = pd.read_csv(original_path)
+                            lower_cols = {c.lower() for c in df_raw.columns}
+                            
+                            # Detect long format by presence of ticker + close columns
+                            if {"ticker", "close"}.issubset(lower_cols):
+                                # Normalize column names for robustness
+                                rename_map = {c: c.lower() for c in df_raw.columns}
+                                df_raw = df_raw.rename(columns=rename_map)
+                                if "date" not in df_raw.columns:
+                                    raise ValueError("Long format file must contain 'date' column.")
+                                
+                                st.info("Detected long format price file. Pivoting on close prices...")
+                                # Pivot to wide using close prices
+                                wide_df = (
+                                    df_raw.pivot(index="date", columns="ticker", values="close")
+                                    .sort_index()
+                                )
+                                
+                                # Drop columns that are completely NaN
+                                wide_df = wide_df.dropna(axis=1, how="all")
+                                
+                                if wide_df.empty:
+                                    raise ValueError("Pivot result is empty. Check input data.")
+                                
+                                # Save to a temp wide CSV
+                                temp_dir = os.path.join(proj_root, "data", "processed")
+                                os.makedirs(temp_dir, exist_ok=True)
+                                wide_path = os.path.join(temp_dir, "_wide_markowitz_prices.csv")
+                                wide_df.to_csv(wide_path)
+                                st.success(f"Pivot complete. Wide file created: {wide_path}")
+                                st.caption(f"Wide tickers ({len(wide_df.columns)}): {', '.join(list(wide_df.columns)[:30])}" + (" ..." if len(wide_df.columns) > 30 else ""))
+                                return wide_path
+                            
+                            # Assume already wide if ticker column not present
+                            st.info("Assuming provided CSV is already in wide format (date + ticker columns).")
+                            return original_path
+                        
+                        # Prepare wide-format path
+                        wide_csv_path = ensure_wide_price_csv(data_csv_path, project_root)
+                        
+                        model_file = os.path.join(project_root, "models", model_path_dict["markowitz"])
+                        optimizer = None
+                        
+                        # Try loading existing optimizer
+                        if os.path.exists(model_file):
+                            optimizer = MarkowitzOptimizer.load_model(model_file)
+                            st.info(f"Loaded Markowitz model: {model_file}")
+                        else:
+                            st.warning("Saved Markowitz model not found. Creating a new instance.")
+                        
+                        # Initialize or refresh optimizer if needed
+                        if optimizer is None:
+                            optimizer = MarkowitzOptimizer(tickers=[], csv_file_path=wide_csv_path)
+                        
+                        # If CSV path changed or returns not loaded, (re)fetch
+                        if (getattr(optimizer, "csv_file_path", None) != wide_csv_path) or (optimizer.returns is None):
+                            optimizer.csv_file_path = wide_csv_path
+                            optimizer.fetch_data()
+                        
+                        # Clean user tickers
+                        cleaned_tickers = [t.strip().upper() for t in tickers if t.strip()]
+                        available_tickers = list(optimizer.mean_returns.index)
+                        
+                        # Intersect
+                        selected_tickers = [t for t in cleaned_tickers if t in available_tickers] if cleaned_tickers else available_tickers
+                        
+                        if cleaned_tickers and not selected_tickers:
+                            st.error("None of the selected tickers are present in the data after pivot.")
+                            st.info(f"Available tickers ({len(available_tickers)}): {', '.join(available_tickers[:60])}" + (" ..." if len(available_tickers) > 60 else ""))
+                            st.stop()
+                        
+                        optimizer.tickers = selected_tickers
+                        
+                        # Reduce mean returns & covariance to selected tickers
+                        optimizer.mean_returns = optimizer.mean_returns[optimizer.tickers]
+                        optimizer.cov_matrix = optimizer.cov_matrix.loc[optimizer.tickers, optimizer.tickers]
+                        
+                        if len(optimizer.tickers) < 2:
+                            st.warning("Need at least two tickers for diversification. Proceeding with single asset stats.")
+                        
+                        # Run optimization
+                        weights_array = optimizer.optimize(target_return=target_return if 'target_return' in locals() else None)
+                        weights = dict(zip(optimizer.tickers, weights_array))
+                        port_return, port_vol, sharpe = optimizer.portfolio_stats(weights_array)
+                        
+                        st.success("Markowitz optimization complete.")
+                        st.subheader("Optimal Weights")
+                        weight_df = pd.DataFrame(
+                            [{"Ticker": k, "Weight": f"{v:.2%}"} for k, v in weights.items()]
+                        )
+                        st.dataframe(weight_df, use_container_width=True)
+                        
+                        fig_w = px.pie(
+                            names=list(weights.keys()),
+                            values=list(weights.values()),
+                            title="Portfolio Allocation (Markowitz)"
+                        )
+                        st.plotly_chart(fig_w, use_container_width=True, key="markowitz_pie")
+                        
+                        col_a, col_b, col_c = st.columns(3)
+                        col_a.metric("Expected Annual Return", f"{port_return:.2%}")
+                        col_b.metric("Annual Volatility", f"{port_vol:.2%}")
+                        col_c.metric("Sharpe Ratio", f"{sharpe:.3f}")
+                    
+                    except Exception as exc:
+                        st.error(f"Markowitz optimization failed: {exc}")
+                        st.stop()
+                
+                elif model_type == "capm":
+                    try:
+                        model_file = os.path.join(project_root, "models", model_path_dict["capm"])
+                        capm_model = None
+                        if os.path.exists(model_file):
+                            capm_model = CAPMOptimizer.load_model(model_file)
+                            st.info(f"Loaded CAPM model: {model_file}")
+                        else:
+                            st.warning("Saved CAPM model not found. Creating a new instance.")
+                        
+                        if capm_model is None:
+                            capm_model = CAPMOptimizer(
+                                tickers=tickers,
+                                market_ticker=market_ticker,
+                                csv_file_path=data_csv_path
+                            )
+                        # Ensure data path set
+                        if capm_model.csv_file_path is None:
+                            capm_model.csv_file_path = data_csv_path
+                        if not os.path.exists(capm_model.csv_file_path):
+                            st.error(f"Returns CSV not found: {capm_model.csv_file_path}")
+                            st.stop()
+                        
+                        # Run optimization
+                        weights, expected_returns, betas = capm_model.optimize_portfolio(market_return=market_return)
+                        
+                        st.success("CAPM optimization complete.")
+                        st.subheader("Weights (Risk-adjusted)")
+                        weights_df = pd.DataFrame([
+                            {
+                                "Ticker": t,
+                                "Weight": f"{weights[t]:.2%}",
+                                "Expected Return": f"{expected_returns[t]:.2%}",
+                                "Beta": f"{betas[t]:.3f}"
+                            }
+                            for t in weights
+                            if (not tickers) or (t in tickers)
+                        ])
+                        st.dataframe(weights_df, use_container_width=True)
+                        
+                        fig_capm_pie = px.pie(
+                            names=list(weights.keys()),
+                            values=list(weights.values()),
+                            title="Portfolio Allocation (CAPM)"
+                        )
+                        st.plotly_chart(fig_capm_pie, use_container_width=True, key="capm_pie")
+                        
+                        # Bar charts
+                        fig_er = px.bar(
+                            x=list(expected_returns.keys()),
+                            y=list(expected_returns.values()),
+                            title="Expected Returns (CAPM)",
+                            labels={"x": "Ticker", "y": "Expected Return"}
+                        )
+                        st.plotly_chart(fig_er, use_container_width=True, key="capm_er_bar")
+                        
+                        fig_beta = px.bar(
+                            x=list(betas.keys()),
+                            y=list(betas.values()),
+                            title="Betas (Systematic Risk)",
+                            labels={"x": "Ticker", "y": "Beta"}
+                        )
+                        st.plotly_chart(fig_beta, use_container_width=True, key="capm_beta_bar")
+                    
+                    except Exception as e:
+                        st.error(f"CAPM optimization failed: {e}")
+                        st.stop()
     
-    # Debug information expander
+    # Debug information
     with st.expander("Debug Information", expanded=False):
-        st.write("This section provides additional information for debugging purposes.")
         st.write(f"Selected Model Type: {model_type}")
         st.write(f"Tickers: {tickers}")
-        st.write(f"Current Allocations: {current_allocations}")
         if model_type == "lstm-ogdm hybrid":
+            st.write(f"Current Allocations: {current_allocations}")
             st.write(f"Sequence Length: {sequence_length}")
+        # Markowitz/CAPM specific inputs
+        if model_type == "markowitz":
+            st.write(f"Target Return: {target_return if 'target_return' in locals() else None}")
+        if model_type == "capm":
+            st.write(f"Market Return: {market_return if 'market_return' in locals() else None}")
         st.write("---")
-        st.write("If you encounter any issues, please check the above parameters and ensure that the model and data files are correctly set up.")
+        st.write("Verify data & model files exist in the models and data/processed directories.")
 
 def render_tab_historical() -> None:
     """
