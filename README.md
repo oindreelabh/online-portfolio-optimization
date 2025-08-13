@@ -94,6 +94,18 @@ cp .env.example .env
 - **Weighting**: Simple average (configurable)
 - **Portfolio Allocation**: Rank-based with diversification constraints
 
+### 5. Advanced Evaluation & Analytics Components (New)
+These scripts provide deeper comparative analysis, allocation dynamics, cost impact, and sentiment influence:
+- performance_comparison.py (src/evaluation): Walk-forward backtest comparing LSTM, OGDM, Hybrid, Equal-Weight, Return-Persistence baselines. Outputs:
+  - metrics_table.csv
+  - predictions_long.csv
+  - portfolio_equity.csv
+  - equity_curves.html, drawdowns.html, sharpe.html
+- portfolio_metrics.py (src/evaluation): Aggregates equity, drawdowns, rolling volatility (portfolio_timeseries.csv + HTML plots).
+- allocation_evolution.py (src/analysis): Tracks allocation shifts, Herfindahl index, top weight (allocation_summary.csv + evolution & concentration HTML charts).
+- transaction_cost_impact.py (src/analysis): Compares naive vs constrained rebalancing (tc_impact.csv + turnover plot).
+- sentiment_influence.py (src/analysis): Correlates sentiment signals with prediction and allocation changes (sentiment_correlations.csv + scatter/regression HTMLs).
+
 ## Usage
 
 ### 1. Data Pipeline
@@ -178,45 +190,76 @@ python -m src.evaluation.evaluate_lstm \
   --output_dir evaluation_results/lstm
 ```
 
-#### Alerts (Email Notifications)
-Configure SMTP and email addresses in .env:
-```
-SMTP_HOST=smtp.yourprovider.com
-SMTP_PORT=587
-SMTP_USER=your_smtp_user
-SMTP_PASSWORD=your_smtp_password
-EMAIL_FROM=alerts@yourdomain.com
-EMAIL_TO=you@yourdomain.com,teammate@yourdomain.com
-```
+#### Advanced Evaluation & Analytics (New)
+Run after models are trained and data processed.
 
-Send a weekly alert (dry run prints content instead of sending):
 ```bash
-python -m src.alerts.send_alerts \
-  --yf_path data/processed/stock_prices_latest.csv \
-  --reddit_path data/processed/reddit_posts.csv \
-  --news_path data/processed/finance_news.csv \
-  --period weekly \
-  --dry_run
+# 1. Model performance comparison & portfolio backtest
+python -m src.evaluation.performance_comparison \
+  --data-csv data/processed/stock_prices_historical.csv \
+  --lstm-model models/lstm_model.keras \
+  --lstm-scaler models/lstm_model_scaler.pkl \
+  --ogdm-model models/ogdm_model.pkl \
+  --sequence-length 5 \
+  --output-dir evaluation_results/perf \
+  --make-plots
+
+# 2. Portfolio metrics (equity, drawdowns, rolling vol)
+python -m src.evaluation.portfolio_metrics \
+  --prices-csv data/processed/stock_prices_historical.csv \
+  --output-dir evaluation_results/metrics \
+  --roll-window 20 \
+  --make-plots
+
+# 3. Allocation evolution (requires weights CSV; can synthesize equal-weight)
+python -m src.analysis.allocation_evolution \
+  --weights-csv analysis_results/alloc_evolution/synthetic_weights.csv \
+  --output-dir analysis_results/alloc_evolution
+
+# 4. Transaction cost impact (uses predictions_long.csv from performance comparison)
+python -m src.analysis.transaction_cost_impact \
+  --predictions-csv evaluation_results/perf/predictions_long.csv \
+  --model-name HYBRID \
+  --output-dir analysis_results/transaction_cost \
+  --cost-rate 0.001
+
+# 5. Sentiment influence (needs sentiment-enriched data + predictions)
+python -m src.analysis.sentiment_influence \
+  --data-csv data/processed/recent_data_with_sentiment.csv \
+  --predictions-csv evaluation_results/perf/predictions_long.csv \
+  --model HYBRID \
+  --output-dir analysis_results/sentiment \
+  --lag-days 1
 ```
 
-Send a monthly alert:
-```bash
-python -m src.alerts.send_alerts \
-  --yf_path data/processed/stock_prices_latest.csv \
-  --period monthly
-```
-
-Options:
-- --threshold_return: override return threshold (default 5% weekly, 10% monthly)
-- --threshold_sentiment: override abs sentiment threshold (default 0.3)
-- --output_dir: write a CSV report in addition to email
-- --email_to / --email_from / --smtp_*: override .env at runtime
+Outputs are consumed by the Advanced Analytics dashboard tab.
 
 ### 3. Dashboard
 Launch the interactive dashboard:
 ```bash
 streamlit run src/dashboard/streamlit_dashboard.py
 ```
+
+#### Advanced Analytics Tab (New)
+The Streamlit dashboard now includes an "Advanced Analytics" tab:
+- Auto-detects artifacts in:
+  - evaluation_results/perf
+  - evaluation_results/metrics
+  - analysis_results/alloc_evolution
+  - analysis_results/transaction_cost
+  - analysis_results/sentiment
+- Displays: performance metrics table, equity & drawdown curves, allocation concentration, turnover & cost savings, sentiment correlations.
+- Includes a "Auto Generate Missing Artifacts" button to run the evaluation scripts (if models & data exist).
+
+### 4. Pipeline Enhancements (New)
+run_pipeline.sh now (optionally) generates evaluation & analysis artifacts BEFORE launching the dashboard:
+- performance_comparison
+- portfolio_metrics
+- allocation_evolution (synthetic equal-weight if no weights supplied)
+- transaction_cost_impact
+- sentiment_influence
+
+Adjust or uncomment earlier data/model steps as needed.
 
 ## Configuration
 
@@ -269,6 +312,26 @@ SUBREDDITS = [
 - **R²**: Coefficient of determination
 - **MAPE**: Mean absolute percentage error
 
+### Additional Analytics Outputs (New)
+Example: metrics_table.csv
+```csv
+model,mse,mae,directional_accuracy,avg_return,volatility,sharpe,cumulative_return
+HYBRID,0.00042,0.0153,0.56,0.0012,0.0125,0.096,0.182
+```
+
+transaction_cost impact (tc_impact.csv)
+```csv
+date,naive_turnover,constrained_turnover,naive_cost,constrained_cost,turnover_reduction,cost_saving
+2024-06-10,0.34,0.18,0.00034,0.00018,0.16,0.00016
+```
+
+sentiment_correlations.csv
+```csv
+sentiment_feature,target,pearson_corr
+reddit_sentiment_lag,predicted_return,0.12
+news_sentiment_lag,alloc_delta,0.08
+```
+
 ## Technical Details
 
 ### Sentiment Analysis
@@ -302,6 +365,12 @@ The system uses structured logging for monitoring:
 2. Create a feature branch
 3. Make changes with appropriate tests
 4. Submit a pull request
+
+## Changelog (New)
+- Added comparative backtesting & analytics scripts.
+- Added advanced_analytics_tab.py to dashboard.
+- Added auto-generation of analytics artifacts (pipeline + dashboard button).
+- Extended README with evaluation workflow & artifact description.
 
 ## Disclaimer
 
