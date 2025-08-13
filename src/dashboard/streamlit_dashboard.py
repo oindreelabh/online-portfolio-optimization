@@ -17,6 +17,7 @@ if project_root not in sys.path:
 from src.model.lstm_ogdm_hybrid import hybrid_predict_and_rebalance, parse_allocations
 from src.model.markowitz import MarkowitzOptimizer
 from src.model.capm_model import CAPMOptimizer
+from src.dashboard.advanced_analytics_tab import render_tab_advanced_analytics
 
 # Page configuration
 st.set_page_config(
@@ -173,8 +174,8 @@ def render_tab_portfolio(model_type: str, project_root: str) -> None:
                 value=0.10,
                 step=0.01
             )
-        # Predict button (all models)
-        predict_button = st.button("Generate Prediction", type="primary")
+        # Predict button (all models) - removed type for compatibility
+        predict_button = st.button("Generate Prediction")
     
     with col2:
         st.subheader("Prediction Results")
@@ -714,23 +715,27 @@ def render_tab_performance() -> None:
     st.plotly_chart(fig_importance, use_container_width=True, key="feat_importance")
 
 # Main dashboard layout
-tab1, tab2, tab3 = st.tabs(["Portfolio Optimization", "Historical Analysis", "Model Performance"])
+tab1, tab2, tab3, tab4 = st.tabs([
+    "Portfolio Optimization",
+    "Historical Analysis",
+    "Model Performance",
+    "Advanced Analytics"
+])
 
 with tab1:
-    # Call the refactored function instead of inline code
     render_tab_portfolio(model_type, project_root)
-
 with tab2:
     render_tab_historical()
-
 with tab3:
     render_tab_performance()
+with tab4:
+    render_tab_advanced_analytics(project_root)
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666;'>
-    <p>Portfolio Optimization Dashboard | Built with Streamlit</p>
+    <p>Portfolio Optimization Dashboard | Built with Streamlit | Use 'Advanced Analytics' tab to auto-generate evaluation artifacts if missing.</p>
 </div>
 """, unsafe_allow_html=True)
 

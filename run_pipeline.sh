@@ -136,6 +136,86 @@ capm_model_name="capm_model.pkl"
 #   --subject_prefix "Portfolio" \
 #   --output_dir "evaluation_results/alerts" || echo "Warning: Alerts step failed (continuing)."
 
+# === Advanced Analytics Artifact Generation (optional, BEFORE dashboard) ===
+echo "Generating advanced analytics artifacts (if prerequisites exist)..."
+
+hist_prices="data/processed/stock_prices_historical.csv"
+recent_sent="data/processed/recent_data_with_sentiment.csv"
+lstm_model_path="models/lstm_model.keras"
+lstm_scaler_path="models/lstm_model_scaler.pkl"
+ogdm_model_path="models/ogdm_model.pkl"
+
+# Performance comparison
+if [ -f "$hist_prices" ] && [ -f "$lstm_model_path" ] && [ -f "$lstm_scaler_path" ] && [ -f "$ogdm_model_path" ]; then
+  if [ ! -f "evaluation_results/perf/metrics_table.csv" ]; then
+    echo "Running performance_comparison..."
+    python -m src.evaluation.performance_comparison \
+      --data-csv "$hist_prices" \
+      --lstm-model "$lstm_model_path" \
+      --lstm-scaler "$lstm_scaler_path" \
+      --ogdm-model "$ogdm_model_path" \
+      --sequence-length 5 \
+      --output-dir evaluation_results/perf || echo "Warning: performance comparison failed."
+  fi
+else
+  echo "Skipping performance comparison (missing models or data)."
+fi
+
+# Portfolio metrics
+if [ -f "$hist_prices" ] && [ ! -f "evaluation_results/metrics/portfolio_timeseries.csv" ]; then
+  echo "Running portfolio_metrics..."
+  python -m src.evaluation.portfolio_metrics \
+    --prices-csv "$hist_prices" \
+    --output-dir evaluation_results/metrics \
+    --roll-window 20 \
+    --make-plots || echo "Warning: portfolio metrics failed."
+fi
+
+# Allocation evolution (synthetic equal-weight if no weights)
+if [ -f "$hist_prices" ] && [ ! -f "analysis_results/alloc_evolution/allocation_summary.csv" ]; then
+  echo "Preparing synthetic weights for allocation evolution..."
+  mkdir -p analysis_results/alloc_evolution
+  python - <<'PYEOF'
+import pandas as pd, os
+hist="data/processed/stock_prices_historical.csv"
+out="analysis_results/alloc_evolution/synthetic_weights.csv"
+if os.path.exists(hist) and not os.path.exists(out):
+    df=pd.read_csv(hist)
+    if {"date","ticker","close"}.issubset(df.columns):
+        df["date"]=pd.to_datetime(df["date"])
+        last=sorted(df["date"].unique())[-60:]
+        rows=[]
+        for d,g in df[df["date"].isin(last)].groupby("date"):
+            t=list(sorted(g["ticker"].unique()))
+            if not t: continue
+            w=1/len(t)
+            rows.extend({"date":d,"ticker":ti,"weight":w} for ti in t)
+        pd.DataFrame(rows).to_csv(out,index=False)
+PYEOF
+  python -m src.analysis.allocation_evolution \
+    --weights-csv analysis_results/alloc_evolution/synthetic_weights.csv \
+    --output-dir analysis_results/alloc_evolution || echo "Warning: allocation evolution failed."
+fi
+
+# Transaction cost impact
+if [ -f "evaluation_results/perf/predictions_long.csv" ] && [ ! -f "analysis_results/transaction_cost/tc_impact.csv" ]; then
+  echo "Running transaction_cost_impact..."
+  python -m src.analysis.transaction_cost_impact \
+    --predictions-csv evaluation_results/perf/predictions_long.csv \
+    --model-name HYBRID \
+    --output-dir analysis_results/transaction_cost || echo "Warning: transaction cost impact failed."
+fi
+
+# Sentiment influence
+if [ -f "$recent_sent" ] && [ -f "evaluation_results/perf/predictions_long.csv" ] && [ ! -f "analysis_results/sentiment/sentiment_correlations.csv" ]; then
+  echo "Running sentiment_influence..."
+  python -m src.analysis.sentiment_influence \
+    --data-csv "$recent_sent" \
+    --predictions-csv evaluation_results/perf/predictions_long.csv \
+    --model HYBRID \
+    --output-dir analysis_results/sentiment || echo "Warning: sentiment influence failed."
+fi
+
 echo "Starting Streamlit dashboard..."
 echo "Launching Portfolio Optimization Dashboard..."
 echo "Dashboard will be available at: http://localhost:8501"

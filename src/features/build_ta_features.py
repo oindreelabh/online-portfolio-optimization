@@ -4,6 +4,7 @@ import argparse
 from src.utils.helpers import write_df_to_csv
 
 def add_ta_features(df):
+    """Add technical analysis features to the DataFrame."""
     df['rsi'] = momentum.RSIIndicator(df['close']).rsi()
     macd = trend.MACD(df['close'])
     df['macd'] = macd.macd()
@@ -31,5 +32,6 @@ if __name__ == "__main__":
     new_df = pd.read_csv(f'{args.processed_dir}/{args.input_file_new}')
     new_df = add_ta_features(new_df)
 
+    # Write processed feature files (restored)
     write_df_to_csv(hist_df, args.processed_dir, args.input_file_y2)
     write_df_to_csv(new_df, args.processed_dir, args.input_file_new)
