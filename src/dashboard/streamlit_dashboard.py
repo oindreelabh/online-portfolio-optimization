@@ -313,46 +313,139 @@ def render_tab_portfolio(model_type: str, project_root: str) -> None:
 def render_tab_historical() -> None:
     """
     Render the Historical Analysis tab with price/volume charts and stats.
+    Replaced synthetic sample data with real historical data loaded from
+    data/processed/historical.csv (expected columns: date, ticker, close, volume).
     """
     st.header("Historical Analysis")
-    
-    # Sample historical data
-    dates = pd.date_range(start='2023-01-01', end='2024-01-01', freq='D')
-    prices = 100 + np.cumsum(np.random.randn(len(dates)) * 0.5)
-    volume = np.random.randint(1000000, 10000000, len(dates))
-    
-    historical_data = pd.DataFrame({
-        'Date': dates,
-        'Price': prices,
-        'Volume': volume
-    })
-    
+
+    # Path to historical data
+    historical_path = os.path.join(project_root, "data", "processed", "stock_prices_historical.csv")
+
+    if not os.path.exists(historical_path):
+        st.error(f"Historical data file not found: {historical_path}")
+        st.info("Place a CSV named stock_prices_historical.csv under data/processed with columns: date, ticker, close, volume")
+        return
+
+    try:
+        df_hist = pd.read_csv(historical_path)
+    except Exception as e:
+        st.error(f"Failed to read stock_prices_historical.csv: {e}")
+        return
+
+    # Basic validation
+    required_cols = {"date", "ticker", "close"}
+    missing = required_cols.difference(df_hist.columns)
+    if missing:
+        st.error(f"Missing required columns in stock_prices_historical.csv: {', '.join(missing)}")
+        return
+
+    # Optional volume column
+    has_volume = "volume" in df_hist.columns
+
+    # Parse dates
+    try:
+        df_hist["date"] = pd.to_datetime(df_hist["date"])
+    except Exception as e:
+        st.error(f"Failed parsing date column: {e}")
+        return
+
+    # Sidebar-like controls inside tab
+    tickers_available = sorted(df_hist["ticker"].unique())
+    default_selection = tickers_available[:5]
+    selected_tickers = st.multiselect(
+        "Select Tickers",
+        options=tickers_available,
+        default=default_selection,
+        help="Choose one or more tickers to visualize"
+    )
+    if not selected_tickers:
+        st.warning("Select at least one ticker.")
+        return
+
+    min_date, max_date = df_hist["date"].min(), df_hist["date"].max()
+    date_range = st.date_input(
+        "Date Range",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date
+    )
+    if isinstance(date_range, tuple) and len(date_range) == 2:
+        start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
+    else:
+        start_date, end_date = min_date, max_date
+
+    # Filter
+    mask = (
+        df_hist["ticker"].isin(selected_tickers) &
+        (df_hist["date"] >= start_date) &
+        (df_hist["date"] <= end_date)
+    )
+    df_view = df_hist.loc[mask].copy().sort_values(["date", "ticker"])
+
+    if df_view.empty:
+        st.warning("No data after applying filters.")
+        return
+
+    # Price chart
     col1, col2 = st.columns(2)
-    
     with col1:
-        # Price chart
-        fig_price = px.line(historical_data, x='Date', y='Price', title='Historical Price Movement')
-        # Add unique key
-        st.plotly_chart(fig_price, use_container_width=True, key="hist_price")
-    
+        fig_price = px.line(
+            df_view,
+            x="date",
+            y="close",
+            color="ticker",
+            title="Historical Price Movement",
+            labels={"close": "Close", "date": "Date"}
+        )
+        st.plotly_chart(fig_price, use_container_width=True, key="hist_price_real")
+
+    # Volume chart (if available)
     with col2:
-        # Volume chart
-        fig_volume = px.bar(historical_data, x='Date', y='Volume', title='Trading Volume')
-        # Add unique key
-        st.plotly_chart(fig_volume, use_container_width=True, key="hist_volume")
-    
-    # Statistics
+        if has_volume:
+            fig_volume = px.bar(
+                df_view,
+                x="date",
+                y="volume",
+                color="ticker",
+                title="Trading Volume",
+                labels={"volume": "Volume", "date": "Date"}
+            )
+            st.plotly_chart(fig_volume, use_container_width=True, key="hist_volume_real")
+        else:
+            st.info("Volume column not found; skipping volume chart.")
+
+    # Summary metrics over filtered set
     st.subheader("Statistical Summary")
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        st.metric("Mean Price", f"${historical_data['Price'].mean():.2f}")
-    with col2:
-        st.metric("Volatility", f"{historical_data['Price'].std():.2f}")
-    with col3:
-        st.metric("Max Price", f"${historical_data['Price'].max():.2f}")
-    with col4:
-        st.metric("Min Price", f"${historical_data['Price'].min():.2f}")
+    # Aggregate per ticker or overall
+    summary = (
+        df_view.groupby("ticker")["close"]
+        .agg(["mean", "std", "max", "min"])
+        .rename(columns={
+            "mean": "Mean Price",
+            "std": "Volatility",
+            "max": "Max Price",
+            "min": "Min Price"
+        })
+    )
+
+    st.dataframe(summary.style.format({
+        "Mean Price": "{:.2f}",
+        "Volatility": "{:.2f}",
+        "Max Price": "{:.2f}",
+        "Min Price": "{:.2f}"
+    }), use_container_width=True)
+
+    # Overall metrics
+    overall_mean = df_view["close"].mean()
+    overall_vol = df_view["close"].std()
+    overall_max = df_view["close"].max()
+    overall_min = df_view["close"].min()
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Overall Mean", f"${overall_mean:.2f}")
+    c2.metric("Overall Volatility", f"{overall_vol:.2f}")
+    c3.metric("Overall Max", f"${overall_max:.2f}")
+    c4.metric("Overall Min", f"${overall_min:.2f}")
 
 def render_tab_performance() -> None:
     """
