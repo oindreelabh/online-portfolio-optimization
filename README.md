@@ -365,14 +365,3 @@ The system uses structured logging for monitoring:
 2. Create a feature branch
 3. Make changes with appropriate tests
 4. Submit a pull request
-
-## Changelog (New)
-- Added comparative backtesting & analytics scripts.
-- Added advanced_analytics_tab.py to dashboard.
-- Added auto-generation of analytics artifacts (pipeline + dashboard button).
-- Extended README with evaluation workflow & artifact description.
-
-## Disclaimer
-
-This system is for educational and research purposes. Past performance does not guarantee future results. Always consult with financial professionals before making investment decisions.
-
