@@ -731,11 +731,4 @@ with tab3:
 with tab4:
     render_tab_advanced_analytics(project_root)
 
-# Footer
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666;'>
-    <p>Portfolio Optimization Dashboard | Built with Streamlit | Use 'Advanced Analytics' tab to auto-generate evaluation artifacts if missing.</p>
-</div>
-""", unsafe_allow_html=True)
 

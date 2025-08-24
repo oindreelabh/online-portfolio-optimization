@@ -1,0 +1,14 @@
+2025-08-24 22:38:49,820 - INFO - Data loaded successfully. Shape: (17760, 14)
+2025-08-24 22:38:49,821 - INFO - Found 14 numeric columns: ['open', 'high', 'low', 'close', 'volume', 'returns', 'rsi', 'macd', 'macd_signal', 'sma_20', 'ema_20', 'bb_bbm', 'bb_bbh', 'bb_bbl']
+2025-08-24 22:38:49,854 - INFO - Optimal weights: {'open': np.float64(2.344967555360247e-11), 'high': np.float64(2.3347697201488774e-11), 'low': np.float64(2.326568684605472e-11), 'close': np.float64(2.337112121345423e-11), 'volume': np.float64(0.03026332825014495), 'returns': np.float64(0.0), 'rsi': np.float64(0.7501162654285644), 'macd': np.float64(9.780397002410919e-05), 'macd_signal': np.float64(0.0), 'sma_20': np.float64(0.09017999699624887), 'ema_20': np.float64(2.3680644737370097e-11), 'bb_bbm': np.float64(0.09018001766656543), 'bb_bbh': np.float64(2.3950823185639255e-11), 'bb_bbl': np.float64(0.039162587830675874)}
+2025-08-24 22:38:49,854 - INFO - Expected annual return: 1.6242
+2025-08-24 22:38:49,854 - INFO - Annual volatility: 1.5855
+2025-08-24 22:38:49,854 - INFO - Sharpe ratio: 1.0244
+2025-08-24 22:38:49,855 - INFO - Model saved successfully to models/markowitz_model.pkl
+2025-08-24 23:54:09,794 - INFO - Data loaded successfully. Shape: (17760, 14)
+2025-08-24 23:54:09,794 - INFO - Found 14 numeric columns: ['open', 'high', 'low', 'close', 'volume', 'returns', 'rsi', 'macd', 'macd_signal', 'sma_20', 'ema_20', 'bb_bbm', 'bb_bbh', 'bb_bbl']
+2025-08-24 23:54:09,827 - INFO - Optimal weights: {'open': np.float64(2.344967555360247e-11), 'high': np.float64(2.3347697201488774e-11), 'low': np.float64(2.326568684605472e-11), 'close': np.float64(2.337112121345423e-11), 'volume': np.float64(0.03026332825014495), 'returns': np.float64(0.0), 'rsi': np.float64(0.7501162654285644), 'macd': np.float64(9.780397002410919e-05), 'macd_signal': np.float64(0.0), 'sma_20': np.float64(0.09017999699624887), 'ema_20': np.float64(2.3680644737370097e-11), 'bb_bbm': np.float64(0.09018001766656543), 'bb_bbh': np.float64(2.3950823185639255e-11), 'bb_bbl': np.float64(0.039162587830675874)}
+2025-08-24 23:54:09,827 - INFO - Expected annual return: 1.6242
+2025-08-24 23:54:09,827 - INFO - Annual volatility: 1.5855
+2025-08-24 23:54:09,827 - INFO - Sharpe ratio: 1.0244
+2025-08-24 23:54:09,829 - INFO - Model saved successfully to models/markowitz_model.pkl

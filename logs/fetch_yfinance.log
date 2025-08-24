@@ -1,0 +1,32 @@
+2025-08-24 22:26:40,910 - INFO - Starting YFinance data fetching and storing...
+2025-08-24 22:26:40,911 - INFO - Fetching historical data for last 5 years...
+2025-08-24 22:26:40,911 - INFO - Including market ticker: ^GSPC
+2025-08-24 22:26:40,911 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'GOOGL', 'CCEP', 'CFLT', '^GSPC'] | Period: 5y
+2025-08-24 22:26:44,637 - INFO - Successfully fetched yfinance data.
+2025-08-24 22:26:44,644 - INFO - Successfully transformed yfinance data to flat format.
+2025-08-24 22:26:44,663 - INFO - Successfully preprocessed yfinance data.
+2025-08-24 22:26:44,725 - INFO - Historical data written successfully to data/raw/stock_prices_historical.csv.
+2025-08-24 22:26:44,725 - INFO - Fetching latest data for last 1 month...
+2025-08-24 22:26:44,725 - INFO - Including market ticker: ^GSPC
+2025-08-24 22:26:44,725 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'GOOGL', 'CCEP', 'CFLT', '^GSPC'] | Period: 1mo
+2025-08-24 22:26:48,410 - INFO - Successfully fetched yfinance data.
+2025-08-24 22:26:48,413 - INFO - Successfully transformed yfinance data to flat format.
+2025-08-24 22:26:48,421 - INFO - Successfully preprocessed yfinance data.
+2025-08-24 22:26:48,423 - INFO - Latest data written successfully to data/raw/stock_prices_latest.csv.
+2025-08-24 22:26:48,423 - INFO - YFinance data fetching and storing completed.
+2025-08-24 23:30:41,168 - INFO - Starting YFinance data fetching and storing...
+2025-08-24 23:30:41,169 - INFO - Fetching historical data for last 5 years...
+2025-08-24 23:30:41,169 - INFO - Including market ticker: ^GSPC
+2025-08-24 23:30:41,169 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'GOOGL', 'CCEP', 'CFLT', '^GSPC'] | Period: 5y
+2025-08-24 23:30:45,123 - INFO - Successfully fetched yfinance data.
+2025-08-24 23:30:45,129 - INFO - Successfully transformed yfinance data to flat format.
+2025-08-24 23:30:45,152 - INFO - Successfully preprocessed yfinance data.
+2025-08-24 23:30:45,219 - INFO - Historical data written successfully to data/raw/stock_prices_historical.csv.
+2025-08-24 23:30:45,219 - INFO - Fetching latest data for last 1 month...
+2025-08-24 23:30:45,219 - INFO - Including market ticker: ^GSPC
+2025-08-24 23:30:45,219 - INFO - Fetching yfinance data for tickers: ['AAPL', 'TSLA', 'AMZN', 'MSFT', 'NVDA', 'GME', 'AMC', 'META', 'JPM', 'SPY', 'UNH', 'GOOGL', 'CCEP', 'CFLT', '^GSPC'] | Period: 1mo
+2025-08-24 23:30:50,539 - INFO - Successfully fetched yfinance data.
+2025-08-24 23:30:50,547 - INFO - Successfully transformed yfinance data to flat format.
+2025-08-24 23:30:50,557 - INFO - Successfully preprocessed yfinance data.
+2025-08-24 23:30:50,559 - INFO - Latest data written successfully to data/raw/stock_prices_latest.csv.
+2025-08-24 23:30:50,559 - INFO - YFinance data fetching and storing completed.

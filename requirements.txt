@@ -165,6 +165,7 @@ pandas-stubs==2.2.3.250527
 pandocfilters==1.5.1
 parso==0.8.4
 pathspec==0.12.1
+patsy==1.0.1
 peewee==3.18.1
 pendulum==3.1.0
 pexpect==4.9.0
@@ -229,6 +230,7 @@ SQLAlchemy-Utils==0.41.2
 sqlparse==0.5.3
 stack-data==0.6.3
 starlette==0.46.2
+statsmodels==0.14.5
 streamlit==1.47.0
 structlog==25.3.0
 svcs==25.1.0

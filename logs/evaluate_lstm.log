@@ -1,0 +1,22 @@
+2025-08-24 22:38:53,677 - WARNING - Found 77 NaN values in test data, filling with zeros
+2025-08-24 22:38:53,679 - INFO - Evaluating LSTM model for AAPL
+2025-08-24 22:38:53,679 - WARNING - Not enough data for AAPL (need > 5 rows)
+2025-08-24 22:38:53,679 - INFO - Evaluating LSTM model for AMZN
+2025-08-24 22:38:53,679 - WARNING - Not enough data for AMZN (need > 5 rows)
+2025-08-24 22:38:53,679 - INFO - Evaluating LSTM model for JPM
+2025-08-24 22:38:53,679 - WARNING - Not enough data for JPM (need > 5 rows)
+2025-08-24 22:38:53,679 - INFO - Evaluating LSTM model for MSFT
+2025-08-24 22:38:53,679 - WARNING - Not enough data for MSFT (need > 5 rows)
+2025-08-24 22:38:53,679 - INFO - Evaluating LSTM model for SPY
+2025-08-24 22:38:53,679 - WARNING - Not enough data for SPY (need > 5 rows)
+2025-08-24 22:38:53,679 - ERROR - No valid predictions collected
+2025-08-24 22:38:53,679 - ERROR - 
+Error in evaluation: No valid predictions collected
+2025-08-24 23:54:13,581 - WARNING - Found 32 NaN values in test data, filling with zeros
+2025-08-24 23:54:13,582 - INFO - Evaluating LSTM model for AAPL
+2025-08-24 23:54:13,582 - WARNING - Not enough data for AAPL (need > 5 rows)
+2025-08-24 23:54:13,582 - INFO - Evaluating LSTM model for SPY
+2025-08-24 23:54:13,582 - WARNING - Not enough data for SPY (need > 5 rows)
+2025-08-24 23:54:13,582 - ERROR - No valid predictions collected
+2025-08-24 23:54:13,582 - ERROR - 
+Error in evaluation: No valid predictions collected
