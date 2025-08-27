@@ -14,3 +14,7 @@
 2025-08-27 17:06:09,885 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
 2025-08-27 17:06:09,913 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
 2025-08-27 17:06:09,913 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-27 19:03:29,838 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 19:03:29,983 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 19:03:30,009 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-27 19:03:30,009 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)

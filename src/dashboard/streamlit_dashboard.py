@@ -668,51 +668,138 @@ def render_tab_historical() -> None:
 
 def render_tab_performance() -> None:
     """
-    Render the Model Performance Metrics tab with metrics, confusion matrix, and feature importance.
+    Render Model Performance using real evaluation artifacts:
+      - metrics_table.csv (walk-forward backtest: HYBRID, LSTM, OGDM, baselines)
+      - portfolio_equity.csv (equity curves)
+      - lstm_evaluation_results.csv (per-ticker regression error metrics)
+    Falls back gracefully if artifacts are missing.
     """
     st.header("Model Performance Metrics")
-    
-    # Performance metrics
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Classification Metrics")
-        metrics_data = {
-            'Metric': ['Accuracy', 'Precision', 'Recall', 'F1-Score'],
-            'Value': [0.85, 0.82, 0.88, 0.85]
-        }
-        metrics_df = pd.DataFrame(metrics_data)
-        
-        fig_metrics = px.bar(metrics_df, x='Metric', y='Value', title='Model Performance Metrics')
-        fig_metrics.update_layout(yaxis=dict(range=[0, 1]))
-        # Add unique key
-        st.plotly_chart(fig_metrics, use_container_width=True, key="perf_metrics")
-    
-    with col2:
-        st.subheader("Confusion Matrix")
-        confusion_matrix = np.array([[85, 15], [12, 88]])
-        fig_cm = px.imshow(confusion_matrix, 
-                          text_auto=True, 
-                          aspect="auto",
-                          title="Confusion Matrix",
-                          labels=dict(x="Predicted", y="Actual"))
-        # Add unique key
-        st.plotly_chart(fig_cm, use_container_width=True, key="perf_cm")
-    
-    # Feature importance
-    st.subheader("Feature Importance")
-    features = ['RSI', 'MACD', 'Volume', 'Moving Average', 'Bollinger Bands', 'VIX']
-    importance = np.random.rand(len(features))
-    
-    feature_df = pd.DataFrame({
-        'Feature': features,
-        'Importance': importance
-    }).sort_values('Importance', ascending=True)
-    
-    fig_importance = px.bar(feature_df, x='Importance', y='Feature', 
-                           orientation='h', title='Feature Importance')
-    # Add unique key
-    st.plotly_chart(fig_importance, use_container_width=True, key="feat_importance")
+
+    perf_dir = os.path.join(project_root, "evaluation_results", "perf")
+    lstm_dir = os.path.join(project_root, "evaluation_results", "lstm")
+
+    metrics_path = os.path.join(perf_dir, "metrics_table.csv")
+    equity_path = os.path.join(perf_dir, "portfolio_equity.csv")
+    lstm_eval_path = os.path.join(lstm_dir, "lstm_evaluation_results.csv")
+
+    def _safe_read(path, **kwargs):
+        if os.path.exists(path):
+            try:
+                return pd.read_csv(path, **kwargs)
+            except Exception as e:
+                st.warning(f"Failed to read {os.path.basename(path)}: {e}")
+        return None
+
+    metrics_df = _safe_read(metrics_path)
+    equity_df = _safe_read(equity_path)
+    lstm_df = _safe_read(lstm_eval_path, index_col=0)
+
+    # --- Hybrid / primary model KPI summary ---
+    if metrics_df is not None and not metrics_df.empty:
+        # Ensure ordering (HYBRID first)
+        metrics_df["model"] = metrics_df["model"].astype(str)
+        metrics_df = metrics_df.set_index("model")
+        hybrid_row = metrics_df.loc["HYBRID"] if "HYBRID" in metrics_df.index else None
+
+        # Compute HYBRID max drawdown from equity curve if available
+        hybrid_dd = np.nan
+        if equity_df is not None and not equity_df.empty and "HYBRID" in equity_df["model"].unique():
+            try:
+                eq_h = equity_df[equity_df["model"] == "HYBRID"].copy()
+                eq_h["peak"] = eq_h["equity"].cummax()
+                eq_h["drawdown"] = eq_h["equity"] / eq_h["peak"] - 1
+                hybrid_dd = float(eq_h["drawdown"].min())
+            except Exception:
+                pass
+
+        c1, c2, c3, c4 = st.columns(4)
+        if hybrid_row is not None:
+            c1.metric("HYBRID Sharpe", f"{hybrid_row.get('sharpe', np.nan):.3f}")
+            c2.metric("HYBRID Cum Return", f"{hybrid_row.get('cumulative_return', np.nan):.2%}")
+            c3.metric("HYBRID Directional Acc", f"{hybrid_row.get('directional_accuracy', np.nan):.2%}")
+            c4.metric("HYBRID Max Drawdown", f"{hybrid_dd:.2%}" if np.isfinite(hybrid_dd) else "N/A")
+        else:
+            c1.metric("HYBRID Sharpe", "N/A")
+            c2.metric("HYBRID Cum Return", "N/A")
+            c3.metric("HYBRID Directional Acc", "N/A")
+            c4.metric("HYBRID Max Drawdown", "N/A")
+    else:
+        st.info("metrics_table.csv not found or empty (run performance_comparison script).")
+
+    # --- Equity Curves & Drawdowns ---
+    if equity_df is not None and not equity_df.empty:
+        try:
+            equity_df["date"] = pd.to_datetime(equity_df["date"])
+        except Exception:
+            pass
+        st.subheader("Equity Curves (Backtest)")
+        fig_eq = px.line(equity_df, x="date", y="equity", color="model", title="Portfolio Equity")
+        st.plotly_chart(fig_eq, use_container_width=True, key="perf_equity")
+
+        # Hybrid drawdown plot
+        if "HYBRID" in equity_df["model"].unique():
+            eq_h = equity_df[equity_df["model"] == "HYBRID"].copy().sort_values("date")
+            eq_h["peak"] = eq_h["equity"].cummax()
+            eq_h["drawdown"] = eq_h["equity"] / eq_h["peak"] - 1
+            fig_dd = px.area(eq_h, x="date", y="drawdown", title="HYBRID Drawdown", color_discrete_sequence=["#d62728"])
+            fig_dd.update_yaxes(tickformat=".0%")
+            st.plotly_chart(fig_dd, use_container_width=True, key="perf_hybrid_dd")
+    else:
+        st.info("portfolio_equity.csv not found or empty.")
+
+    # --- Full Metrics Table ---
+    if metrics_df is not None and not metrics_df.empty:
+        ordered = pd.concat([
+            metrics_df.loc[["HYBRID"]] if "HYBRID" in metrics_df.index else pd.DataFrame(),
+            metrics_df.drop(index=["HYBRID"], errors="ignore")
+        ])
+        st.subheader("Model Metrics (Walk-Forward)")
+        st.dataframe(
+            ordered.reset_index().round({
+                "mse": 6, "mae": 6, "directional_accuracy": 4,
+                "avg_return": 6, "volatility": 6, "sharpe": 4, "cumulative_return": 4
+            }),
+            use_container_width=True
+        )
+
+    # --- LSTM Per-Ticker Error Analysis ---
+    st.subheader("LSTM Per-Ticker Error Metrics")
+    if lstm_df is not None and not lstm_df.empty:
+        # If 'overall' row exists keep separate
+        overall_row = None
+        if "overall" in lstm_df.index:
+            overall_row = lstm_df.loc["overall"].copy()
+            lstm_core = lstm_df.drop(index=["overall"])
+        else:
+            lstm_core = lstm_df
+
+        # Clean possible unnamed columns
+        lstm_core = lstm_core.copy()
+        # Sort by MAE ascending (better to worse)
+        sort_col = "MAE" if "MAE" in lstm_core.columns else lstm_core.columns[0]
+        lstm_core_sorted = lstm_core.sort_values(sort_col)
+
+        # Display top 12
+        st.write("Top 12 tickers (lowest MAE):")
+        st.dataframe(lstm_core_sorted.head(12).round(4), use_container_width=True)
+
+        # Bar chart of MAE (top 12)
+        if "MAE" in lstm_core_sorted.columns:
+            mae_plot = lstm_core_sorted.head(12).reset_index().rename(columns={"index": "ticker"})
+            fig_mae = px.bar(mae_plot, x="ticker", y="MAE", title="LSTM MAE (Lower is Better)")
+            st.plotly_chart(fig_mae, use_container_width=True, key="perf_lstm_mae")
+
+        # Overall row metrics summary
+        if overall_row is not None:
+            c1, c2, c3, c4, c5 = st.columns(5)
+            if "MSE" in overall_row: c1.metric("Overall MSE", f"{overall_row['MSE']:.2f}")
+            if "RMSE" in overall_row: c2.metric("Overall RMSE", f"{overall_row['RMSE']:.2f}")
+            if "MAE" in overall_row: c3.metric("Overall MAE", f"{overall_row['MAE']:.2f}")
+            if "R²" in overall_row: c4.metric("Overall R²", f"{overall_row['R²']:.3f}")
+            if "MAPE" in overall_row: c5.metric("Overall MAPE", f"{overall_row['MAPE']:.2f}")
+    else:
+        st.info("lstm_evaluation_results.csv not found or empty (run evaluate_lstm script).")
 
 # Main dashboard layout
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -730,5 +817,6 @@ with tab3:
     render_tab_performance()
 with tab4:
     render_tab_advanced_analytics(project_root)
+
 
 

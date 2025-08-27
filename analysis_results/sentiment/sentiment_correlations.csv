@@ -1,3 +1,0 @@
-sentiment_feature,target,pearson_corr
-reddit_sentiment_score_lag,predicted_return,
-news_sentiment_score_lag,predicted_return,
