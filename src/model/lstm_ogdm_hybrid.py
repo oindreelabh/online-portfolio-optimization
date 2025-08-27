@@ -21,31 +21,93 @@ def load_lstm_model(model_path, scaler_path):
 
 def _prepare_scaled_features(recent_data: pd.DataFrame, feature_cols, target_col, scaler, sequence_length: int):
     """
-    Prepare a scaled feature matrix for the last `sequence_length` rows using the provided scaler.
-    It appends a dummy target column to match scaler expectations.
+    Prepare a scaled feature matrix (last `sequence_length` rows) using the provided scaler.
+    Ensures no NaNs reach the scaler:
+      - forward/back fill
+      - neutral defaults for fully-missing technical indicators
+      - median fallback
     """
-    # Ensure we have enough rows after cleaning
-    data = recent_data.copy()
-    data = data.sort_index()  # keep time order if index is datetime/increasing
-    # Fill and drop any remaining NaNs for the used columns
-    data[feature_cols + [target_col]] = data[feature_cols + [target_col]].ffill().bfill()
+    data = recent_data.copy().sort_index()
+    cols = feature_cols + [target_col]
+
+    # Initial fill
+    data[cols] = data[cols].ffill().bfill()
+
     if len(data) < sequence_length:
         raise ValueError(f"Insufficient rows after cleaning. Need {sequence_length}, have {len(data)}")
 
-    # Take exactly the last `sequence_length` rows
     window = data.iloc[-sequence_length:].copy()
 
-    # Build array with dummy target for scaling
+    # Detect fully-missing feature columns in the window
+    fully_missing = [c for c in feature_cols if window[c].isna().all()]
+    if fully_missing:
+        imputed = {}
+        close_ref_col = target_col  # assume target_col is close/price
+        close_vals = window[close_ref_col]
+
+        for col in fully_missing:
+            lower = col.lower()
+
+            if lower == "rsi":
+                window[col] = 50.0
+                imputed[col] = "neutral_rsi_50"
+            elif "macd_signal" in lower:
+                window[col] = 0.0
+                imputed[col] = "neutral_macd_signal_0"
+            elif "macd" in lower:
+                window[col] = 0.0
+                imputed[col] = "neutral_macd_0"
+            elif lower.startswith("sma") or lower.startswith("ema"):
+                # Use current close as proxy
+                window[col] = close_vals.values
+                imputed[col] = "proxy_close_for_ma"
+            elif lower.startswith("bb_bbm"):
+                window[col] = close_vals.values
+                imputed[col] = "bb_mid=close"
+            elif lower.startswith("bb_bbh"):
+                window[col] = close_vals.values
+                imputed[col] = "bb_high=close"
+            elif lower.startswith("bb_bbl"):
+                window[col] = close_vals.values
+                imputed[col] = "bb_low=close"
+            else:
+                # Generic neutral fallback
+                window[col] = close_vals.values
+                imputed[col] = "generic_close_fallback"
+
+        logger.warning(f"Imputed fully-missing indicators in prediction window: {imputed}")
+
+    # Column-wise median fallback for any residual NaNs
+    residual_nan_cols = [c for c in feature_cols if window[c].isna().any()]
+    if residual_nan_cols:
+        med_map = {}
+        for c in residual_nan_cols:
+            med = data[c].median()
+            if not np.isfinite(med):
+                med = 0.0
+            window[c] = window[c].fillna(med)
+            med_map[c] = med
+        logger.warning(f"Filled residual NaNs with medians: {med_map}")
+
+    # Final guard
+    if window[feature_cols].isna().any().any():
+        bad = window[feature_cols].isna().sum()
+        raise ValueError(f"NaNs remain after imputation: {bad[bad>0].to_dict()}")
+
+    # Build scaling frame
     x_features = window[feature_cols].astype(float).values
     dummy_target = np.zeros((sequence_length, 1), dtype=np.float32)
     all_cols = feature_cols + [target_col]
-    recent_for_scaling_df = pd.DataFrame(np.hstack([x_features, dummy_target]), columns=all_cols)
+    to_scale = pd.DataFrame(np.hstack([x_features, dummy_target]), columns=all_cols)
 
-    # Scale using the saved scaler (fit on features + target)
-    recent_scaled_df = pd.DataFrame(scaler.transform(recent_for_scaling_df), columns=all_cols)
-    x_scaled = recent_scaled_df.iloc[:, :-1].values  # scaled features only
+    recent_scaled_df = pd.DataFrame(scaler.transform(to_scale), columns=all_cols)
+
+    if recent_scaled_df.isna().any().any():
+        bad_scaled = recent_scaled_df.isna().sum()
+        raise ValueError(f"Scaler produced NaNs (likely corrupt scaler). Columns: {bad_scaled[bad_scaled>0].to_dict()}")
+
+    x_scaled = recent_scaled_df.iloc[:, :-1].values
     last_close = float(window[target_col].iloc[-1])
-
     return x_scaled, last_close, all_cols
 
 def predict_next(model, scaler, feature_cols, target_col, recent_data, sequence_length=10):

@@ -6,3 +6,11 @@
 2025-08-24 23:52:35,287 - INFO - Fetched 100 news articles from FinanceLayer.
 2025-08-24 23:52:35,303 - INFO - Latest data written successfully to data/raw/finance_news.csv.
 2025-08-24 23:52:35,303 - INFO - FinanceLayer news fetching and storing completed.
+2025-08-27 15:12:49,034 - INFO - Starting FinanceLayer news fetching and storing...
+2025-08-27 15:12:54,388 - INFO - Fetched 100 news articles from FinanceLayer.
+2025-08-27 15:12:54,400 - INFO - Latest data written successfully to data/raw/finance_news.csv.
+2025-08-27 15:12:54,400 - INFO - FinanceLayer news fetching and storing completed.
+2025-08-27 16:43:05,532 - INFO - Starting FinanceLayer news fetching and storing...
+2025-08-27 16:43:11,093 - INFO - Fetched 100 news articles from FinanceLayer.
+2025-08-27 16:43:11,108 - INFO - Latest data written successfully to data/raw/finance_news.csv.
+2025-08-27 16:43:11,108 - INFO - FinanceLayer news fetching and storing completed.

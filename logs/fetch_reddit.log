@@ -22,3 +22,27 @@
 2025-08-24 23:52:29,218 - INFO - Preprocessed Reddit posts.
 2025-08-24 23:52:29,245 - INFO - Latest data written successfully to data/raw/reddit_posts.csv.
 2025-08-24 23:52:29,246 - INFO - Reddit data fetching and storing completed.
+2025-08-27 15:02:09,718 - INFO - Starting Reddit data fetching and storing...
+2025-08-27 15:02:10,897 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
+2025-08-27 15:02:10,898 - INFO - Fetching posts from r/stocks
+2025-08-27 15:05:43,631 - INFO - Fetching posts from r/wallstreetbets
+2025-08-27 15:08:52,361 - INFO - Fetching posts from r/investing
+2025-08-27 15:10:11,709 - INFO - Fetching posts from r/stockmarket
+2025-08-27 15:10:57,621 - INFO - Fetching posts from r/pennystocks
+2025-08-27 15:12:10,023 - INFO - Fetching posts from r/IndianStockMarket
+2025-08-27 15:12:47,602 - INFO - Fetched 732 Reddit posts.
+2025-08-27 15:12:47,676 - INFO - Preprocessed Reddit posts.
+2025-08-27 15:12:47,704 - INFO - Latest data written successfully to data/raw/reddit_posts.csv.
+2025-08-27 15:12:47,705 - INFO - Reddit data fetching and storing completed.
+2025-08-27 15:24:52,048 - INFO - Starting Reddit data fetching and storing...
+2025-08-27 15:24:53,269 - INFO - Starting fetch_and_store_recent_reddit_posts for last 30 days, limit 1000
+2025-08-27 15:24:53,269 - INFO - Fetching posts from r/stocks
+2025-08-27 15:28:12,896 - INFO - Fetching posts from r/wallstreetbets
+2025-08-27 16:39:07,484 - INFO - Fetching posts from r/investing
+2025-08-27 16:40:30,116 - INFO - Fetching posts from r/stockmarket
+2025-08-27 16:41:16,188 - INFO - Fetching posts from r/pennystocks
+2025-08-27 16:42:27,649 - INFO - Fetching posts from r/IndianStockMarket
+2025-08-27 16:43:03,835 - INFO - Fetched 728 Reddit posts.
+2025-08-27 16:43:03,911 - INFO - Preprocessed Reddit posts.
+2025-08-27 16:43:03,939 - INFO - Latest data written successfully to data/raw/reddit_posts.csv.
+2025-08-27 16:43:03,939 - INFO - Reddit data fetching and storing completed.

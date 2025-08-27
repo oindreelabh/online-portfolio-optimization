@@ -130,14 +130,14 @@ capm_model_name="capm_model.pkl"
 #   --subject_prefix "Portfolio" \
 #   --output_dir "evaluation_results/alerts" || echo "Warning: Alerts step failed (continuing)."
 
-# Advanced Analytics Artifact Generation
-echo "Generating advanced analytics artifacts (if prerequisites exist)..."
+# # Advanced Analytics Artifact Generation
+# echo "Generating advanced analytics artifacts (if prerequisites exist)..."
 
-hist_prices="data/processed/stock_prices_historical.csv"
-recent_sent="data/processed/recent_data_with_sentiment.csv"
-lstm_model_path="models/lstm_model.keras"
-lstm_scaler_path="models/lstm_model_scaler.pkl"
-ogdm_model_path="models/ogdm_model.pkl"
+# hist_prices="data/processed/stock_prices_historical.csv"
+# recent_sent="data/processed/recent_data_with_sentiment.csv"
+# lstm_model_path="models/lstm_model.keras"
+# lstm_scaler_path="models/lstm_model_scaler.pkl"
+# ogdm_model_path="models/ogdm_model.pkl"
 
 # Performance comparison
 # if [ -f "$hist_prices" ] && [ -f "$lstm_model_path" ] && [ -f "$lstm_scaler_path" ] && [ -f "$ogdm_model_path" ]; then

@@ -24,3 +24,18 @@
 2025-08-25 00:26:35,627 - INFO - Made predictions for 5 samples.
 2025-08-25 00:26:35,650 - INFO - Made predictions for 5 samples.
 2025-08-25 00:26:35,672 - INFO - Made predictions for 5 samples.
+2025-08-25 00:33:35,388 - INFO - Model loaded from models/ogdm_model.pkl.
+2025-08-27 16:44:46,009 - INFO - Loading data from data/processed/recent_data_with_sentiment.csv
+2025-08-27 16:44:46,012 - INFO - Numeric feature columns: ['open', 'high', 'low', 'volume', 'returns', 'rsi', 'macd', 'macd_signal', 'sma_20', 'ema_20', 'bb_bbm', 'bb_bbh', 'bb_bbl', 'reddit_sentiment_score', 'news_sentiment_score']
+2025-08-27 16:44:46,012 - INFO - Loaded 286 records with 15 numeric features.
+2025-08-27 16:44:46,013 - INFO - Model loaded from models/ogdm_model.pkl.
+2025-08-27 16:44:46,014 - INFO - Made predictions for 286 samples.
+2025-08-27 16:44:46,014 - INFO - Performed partial_fit step with momentum.
+2025-08-27 16:44:46,014 - INFO - Model saved to models/ogdm_model.pkl.
+2025-08-27 16:44:46,014 - INFO - OGDM training step completed and model saved.
+2025-08-27 17:05:39,932 - INFO - Model loaded from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/ogdm_model.pkl.
+2025-08-27 17:05:40,119 - INFO - Made predictions for 5 samples.
+2025-08-27 17:05:40,142 - INFO - Made predictions for 5 samples.
+2025-08-27 17:06:09,793 - INFO - Model loaded from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/ogdm_model.pkl.
+2025-08-27 17:06:09,886 - INFO - Made predictions for 5 samples.
+2025-08-27 17:06:09,913 - INFO - Made predictions for 5 samples.

@@ -20,3 +20,26 @@ Error in evaluation: No valid predictions collected
 2025-08-24 23:54:13,582 - ERROR - No valid predictions collected
 2025-08-24 23:54:13,582 - ERROR - 
 Error in evaluation: No valid predictions collected
+2025-08-27 16:44:49,934 - WARNING - Found 148 NaN values in test data, filling with zeros
+2025-08-27 16:44:49,935 - INFO - Evaluating LSTM model for AAPL
+2025-08-27 16:44:50,473 - INFO - Evaluating LSTM model for AMC
+2025-08-27 16:44:50,616 - INFO - Evaluating LSTM model for AMZN
+2025-08-27 16:44:50,676 - INFO - Evaluating LSTM model for CCEP
+2025-08-27 16:44:50,736 - INFO - Evaluating LSTM model for CFLT
+2025-08-27 16:44:50,792 - INFO - Evaluating LSTM model for GME
+2025-08-27 16:44:50,847 - INFO - Evaluating LSTM model for GOOGL
+2025-08-27 16:44:50,907 - INFO - Evaluating LSTM model for JPM
+2025-08-27 16:44:50,968 - INFO - Evaluating LSTM model for META
+2025-08-27 16:44:51,027 - INFO - Evaluating LSTM model for MSFT
+2025-08-27 16:44:51,089 - INFO - Evaluating LSTM model for NVDA
+2025-08-27 16:44:51,151 - INFO - Evaluating LSTM model for SPY
+2025-08-27 16:44:51,212 - INFO - Evaluating LSTM model for TSLA
+2025-08-27 16:44:51,271 - INFO - Evaluating LSTM model for UNH
+2025-08-27 16:44:51,328 - INFO - Evaluating LSTM model for ^GSPC
+2025-08-27 16:44:51,422 - INFO - 
+LSTM Model Evaluation Results (Overall):
+2025-08-27 16:44:51,422 - INFO - MSE: 310898.1968
+2025-08-27 16:44:51,422 - INFO - RMSE: 557.5825
+2025-08-27 16:44:51,422 - INFO - MAE: 166.8818
+2025-08-27 16:44:51,422 - INFO - R²: 0.8777
+2025-08-27 16:44:51,422 - INFO - MAPE: 75.4401

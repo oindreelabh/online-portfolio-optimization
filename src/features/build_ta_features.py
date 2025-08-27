@@ -29,7 +29,7 @@ if __name__ == "__main__":
     hist_df = pd.read_csv(f'{args.raw_dir}/{args.input_file_y2}')
     hist_df = add_ta_features(hist_df)
 
-    new_df = pd.read_csv(f'{args.processed_dir}/{args.input_file_new}')
+    new_df = pd.read_csv(f'{args.raw_dir}/{args.input_file_new}')
     new_df = add_ta_features(new_df)
 
     # Write processed feature files (restored)

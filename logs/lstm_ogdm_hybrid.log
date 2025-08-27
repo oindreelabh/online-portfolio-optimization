@@ -6,3 +6,11 @@
 2025-08-25 00:26:35,627 - WARNING - No valid predictions for AAPL. Skipping.
 2025-08-25 00:26:35,650 - WARNING - No valid predictions for AMZN. Skipping.
 2025-08-25 00:26:35,672 - WARNING - No valid predictions for GOOGL. Skipping.
+2025-08-27 17:05:39,939 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 17:05:40,116 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 17:05:40,142 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-27 17:05:40,142 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-27 17:06:09,795 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 17:06:09,885 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-27 17:06:09,913 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-27 17:06:09,913 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
