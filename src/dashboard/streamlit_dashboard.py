@@ -672,7 +672,7 @@ def render_tab_performance() -> None:
       - metrics_table.csv (walk-forward backtest: HYBRID, LSTM, OGDM, baselines)
       - portfolio_equity.csv (equity curves)
       - lstm_evaluation_results.csv (per-ticker regression error metrics)
-    Falls back gracefully if artifacts are missing.
+    Falls back gracefully if paths are missing.
     """
     st.header("Model Performance Metrics")
 
@@ -697,7 +697,6 @@ def render_tab_performance() -> None:
 
     # --- Hybrid / primary model KPI summary ---
     if metrics_df is not None and not metrics_df.empty:
-        # Ensure ordering (HYBRID first)
         metrics_df["model"] = metrics_df["model"].astype(str)
         metrics_df = metrics_df.set_index("model")
         hybrid_row = metrics_df.loc["HYBRID"] if "HYBRID" in metrics_df.index else None

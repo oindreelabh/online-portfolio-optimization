@@ -19,3 +19,5 @@
 2025-08-27 16:44:46,493 - INFO - Annual volatility: 1.9140
 2025-08-27 16:44:46,493 - INFO - Sharpe ratio: 1.0003
 2025-08-27 16:44:46,494 - INFO - Model saved successfully to models/markowitz_model.pkl
+2025-08-27 19:08:32,463 - INFO - Model loaded successfully from /Users/oindreelabhowmick/Documents/WILP/Sem4/dissertation/models/markowitz_model.pkl
+2025-08-27 19:08:32,473 - INFO - Data loaded successfully. Shape: (1044, 15)
