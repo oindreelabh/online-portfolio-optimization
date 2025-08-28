@@ -18,3 +18,47 @@
 2025-08-27 19:03:29,983 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
 2025-08-27 19:03:30,009 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
 2025-08-27 19:03:30,009 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:08:48,624 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:08:48,797 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:08:48,822 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-29 01:08:48,822 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:10:32,044 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:10:32,193 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:10:32,217 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-29 01:10:32,217 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:10:39,327 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:10:39,420 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:10:39,421 - INFO - Sorted tickers by predicted returns: ['AAPL']
+2025-08-29 01:10:39,421 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-29 01:10:47,636 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:10:58,611 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:11:00,015 - INFO - Sorted tickers by predicted returns: ['GOOGL']
+2025-08-29 01:11:00,015 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-29 01:11:27,538 - INFO - Sorted tickers by predicted returns: ['META', 'GOOGL']
+2025-08-29 01:11:27,538 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:12:05,169 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:12:05,268 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:12:05,292 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-29 01:12:05,292 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:12:42,286 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:12:42,433 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:12:42,458 - INFO - Sorted tickers by predicted returns: ['AMZN', 'AAPL']
+2025-08-29 01:12:42,458 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:12:59,661 - INFO - Sorted tickers by predicted returns: ['META']
+2025-08-29 01:12:59,661 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-29 01:13:57,206 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:14:02,123 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:14:03,716 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:14:03,809 - WARNING - Imputed fully-missing indicators in prediction window: {'macd': 'neutral_macd_0', 'macd_signal': 'neutral_macd_signal_0'}
+2025-08-29 01:14:03,810 - INFO - Sorted tickers by predicted returns: ['AAPL']
+2025-08-29 01:14:03,810 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-29 01:14:13,582 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:14:22,259 - INFO - Sorted tickers by predicted returns: ['GOOGL']
+2025-08-29 01:14:22,259 - INFO - Diversification check: Maximum allocation = 100.00% (limit: 25.00%)
+2025-08-29 01:14:28,050 - ERROR - Error in hybrid prediction: pop from empty list
+2025-08-29 01:14:48,609 - INFO - Sorted tickers by predicted returns: ['GOOGL', 'NVDA']
+2025-08-29 01:14:48,609 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:15:36,466 - INFO - Sorted tickers by predicted returns: ['GOOGL', 'NVDA']
+2025-08-29 01:15:36,468 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 01:15:55,532 - INFO - Sorted tickers by predicted returns: ['GOOGL', 'NVDA']
+2025-08-29 01:15:55,532 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
