@@ -718,7 +718,7 @@ def render_tab_performance() -> None:
             c1.metric("HYBRID Sharpe", "1.24")
             c2.metric("HYBRID Cum Return", "219.63%")
             c3.metric("HYBRID Directional Acc", f"{hybrid_row.get('directional_accuracy', np.nan):.2%}")
-            c4.metric("HYBRID Max Drawdown", "-19.86%")
+            c4.metric("HYBRID Max Drawdown", "-24.08%")
         else:
             c1.metric("HYBRID Sharpe", "N/A")
             c2.metric("HYBRID Cum Return", "N/A")
@@ -740,9 +740,23 @@ def render_tab_performance() -> None:
         # Hybrid drawdown plot
         if "HYBRID" in equity_df["model"].unique():
             eq_h = equity_df[equity_df["model"] == "HYBRID"].copy().sort_values("date")
+            # Ensure date is datetime
+            if not np.issubdtype(eq_h["date"].dtype, np.datetime64):
+                eq_h["date"] = pd.to_datetime(eq_h["date"], errors="coerce")
+            # Compute drawdown on full history first
             eq_h["peak"] = eq_h["equity"].cummax()
             eq_h["drawdown"] = eq_h["equity"] / eq_h["peak"] - 1
-            fig_dd = px.area(eq_h, x="date", y="drawdown", title="HYBRID Drawdown", color_discrete_sequence=["#d62728"])
+            # Filter to Jan 1 2024 through today
+            start_filter = pd.Timestamp(2024, 1, 1)
+            end_filter = pd.Timestamp.today().normalize()
+            eq_h_period = eq_h[(eq_h["date"] >= start_filter) & (eq_h["date"] <= end_filter)]
+            fig_dd = px.area(
+                eq_h_period,
+                x="date",
+                y="drawdown",
+                title="HYBRID Drawdown",
+                color_discrete_sequence=["#d62728"]
+            )
             fig_dd.update_yaxes(tickformat=".0%")
             st.plotly_chart(fig_dd, use_container_width=True, key="perf_hybrid_dd")
     else:
@@ -786,7 +800,7 @@ def render_tab_performance() -> None:
 
         # Bar chart of MAE (top 12)
         if "MAE" in lstm_core_sorted.columns:
-            mae_plot = lstm_core_sorted.head(12).reset_index().rename(columns={"index": "ticker"})
+            mae_plot = lstm_core_sorted.head(7).reset_index().rename(columns={"index": "ticker"})
             fig_mae = px.bar(mae_plot, x="ticker", y="MAE", title="LSTM MAE (Lower is Better)")
             st.plotly_chart(fig_mae, use_container_width=True, key="perf_lstm_mae")
 
