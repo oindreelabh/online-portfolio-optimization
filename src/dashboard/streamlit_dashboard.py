@@ -20,12 +20,11 @@ from src.model.capm_model import CAPMOptimizer
 
 # Page configuration
 st.set_page_config(
-    page_title="Portfolio Optimization Dashboard",  # Title shown in browser tab
-    layout="wide",                                 # "centered" or "wide"
-    initial_sidebar_state="auto"               # "auto", "expanded", or "collapsed"
+    page_title="Portfolio Optimization Dashboard", 
+    layout="wide",                                
+    initial_sidebar_state="auto"              
 )
 
-# Custom CSS
 st.markdown("""
 <style>
     .main-header {
