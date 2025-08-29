@@ -710,14 +710,10 @@ def render_tab_performance() -> None:
 
         c1, c2, c3, c4 = st.columns(4)
         if hybrid_row is not None:
-            # c1.metric("HYBRID Sharpe", f"{hybrid_row.get('sharpe', np.nan):.3f}")
-            # c2.metric("HYBRID Cum Return", f"{hybrid_row.get('cumulative_return', np.nan):.2%}")
-            # c3.metric("HYBRID Directional Acc", f"{hybrid_row.get('directional_accuracy', np.nan):.2%}")
-            # c4.metric("HYBRID Max Drawdown", f"{hybrid_dd:.2%}" if np.isfinite(hybrid_dd) else "N/A")
-            c1.metric("HYBRID Sharpe", "1.24")
-            c2.metric("HYBRID Cum Return", "219.63%")
+            c1.metric("HYBRID Sharpe", f"{hybrid_row.get('sharpe', np.nan):.3f}")
+            c2.metric("HYBRID Cum Return", f"{hybrid_row.get('cumulative_return', np.nan):.2%}")
             c3.metric("HYBRID Directional Acc", f"{hybrid_row.get('directional_accuracy', np.nan):.2%}")
-            c4.metric("HYBRID Max Drawdown", "-24.08%")
+            c4.metric("HYBRID Max Drawdown", f"{hybrid_dd:.2%}" if np.isfinite(hybrid_dd) else "N/A")
         else:
             c1.metric("HYBRID Sharpe", "N/A")
             c2.metric("HYBRID Cum Return", "N/A")

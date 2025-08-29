@@ -62,3 +62,5 @@
 2025-08-29 01:15:36,468 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
 2025-08-29 01:15:55,532 - INFO - Sorted tickers by predicted returns: ['GOOGL', 'NVDA']
 2025-08-29 01:15:55,532 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
+2025-08-29 20:19:59,757 - INFO - Sorted tickers by predicted returns: ['GOOGL', 'NVDA']
+2025-08-29 20:19:59,757 - INFO - Diversification check: Maximum allocation = 50.00% (limit: 25.00%)
